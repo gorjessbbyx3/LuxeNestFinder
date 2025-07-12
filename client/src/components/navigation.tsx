@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useTheme } from "@/hooks/use-theme";
-import { Menu, Sun, Moon, Search, Calendar } from "lucide-react";
+import { Menu, Sun, Moon, Search, User, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Navigation() {
@@ -15,8 +15,6 @@ export default function Navigation() {
     { name: "Properties", href: "/properties" },
     { name: "Virtual Tours", href: "/virtual-tours" },
     { name: "Neighborhoods", href: "/neighborhoods" },
-    { name: "Calendar", href: "/calendar" },
-    { name: "Inbox", href: "/inbox" },
     { name: "Sell Your Home", href: "/sell-your-home" },
   ];
 
@@ -70,11 +68,11 @@ export default function Navigation() {
               {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
             </Button>
             
-            {/* Calendar Button */}
-            <Link href="/calendar">
+            {/* Admin Portal Button */}
+            <Link href="/agent-portal">
               <Button className="hidden md:flex" size="sm">
-                <Calendar className="h-4 w-4 mr-2" />
-                Calendar
+                <User className="h-4 w-4 mr-2" />
+                Admin Portal
               </Button>
             </Link>
             

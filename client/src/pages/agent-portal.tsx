@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/navigation';
@@ -48,7 +48,9 @@ import {
   Briefcase,
   ChevronRight,
   Bell,
-  Settings
+  Settings,
+  Inbox,
+  UserPlus
 } from 'lucide-react';
 
 export default function AgentPortalPage() {
@@ -290,34 +292,36 @@ export default function AgentPortalPage() {
           transition={{ delay: 0.2 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <div className="flex justify-between items-center">
-              <TabsList className="grid grid-cols-6 w-fit bg-white shadow-lg">
-                <TabsTrigger value="dashboard" className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                  <BarChart3 className="h-4 w-4" />
-                  Command Center
-                </TabsTrigger>
-                <TabsTrigger value="leads" className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                  <Users className="h-4 w-4" />
-                  Pipeline ({metrics.totalLeads})
-                </TabsTrigger>
-                <TabsTrigger value="appointments" className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                  <Calendar className="h-4 w-4" />
-                  Calendar
-                </TabsTrigger>
-                <TabsTrigger value="contracts" className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                  <FileText className="h-4 w-4" />
-                  Deals
-                </TabsTrigger>
-                <TabsTrigger value="commissions" className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                  <DollarSign className="h-4 w-4" />
-                  Revenue
-                </TabsTrigger>
-                <TabsTrigger value="analytics" className="flex items-center gap-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white">
-                  <Award className="h-4 w-4" />
-                  Analytics
-                </TabsTrigger>
-              </TabsList>
-              
+            <TabsList className="grid w-full grid-cols-7 bg-gradient-to-r from-blue-100 to-purple-100 p-1 rounded-xl">
+              <TabsTrigger value="dashboard" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Users className="h-4 w-4 mr-2" />
+                Dashboard
+              </TabsTrigger>
+              <TabsTrigger value="leads" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Target className="h-4 w-4 mr-2" />
+                Leads
+              </TabsTrigger>
+              <TabsTrigger value="calendar" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Calendar className="h-4 w-4 mr-2" />
+                Calendar
+              </TabsTrigger>
+              <TabsTrigger value="inbox" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Inbox className="h-4 w-4 mr-2" />
+                Inbox
+              </TabsTrigger>
+              <TabsTrigger value="appointments" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Calendar className="h-4 w-4 mr-2" />
+                Appointments
+              </TabsTrigger>
+              <TabsTrigger value="contracts" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <FileText className="h-4 w-4 mr-2" />
+                Contracts
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <BarChart3 className="h-4 w-4 mr-2" />
+                Analytics
+              </TabsTrigger>
+            </TabsList>
               {activeTab === 'leads' && (
                 <div className="flex gap-3">
                   <div className="relative">
@@ -357,7 +361,6 @@ export default function AgentPortalPage() {
                   </Dialog>
                 </div>
               )}
-            </div>
 
             {/* Command Center Dashboard */}
             <TabsContent value="dashboard" className="space-y-6">
@@ -529,10 +532,10 @@ export default function AgentPortalPage() {
                       <div className="space-y-3">
                         <Button 
                           className="w-full h-14 flex items-center justify-between bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                          onClick={() => setActiveTab('leads')}
+                          onClick={() => setActiveTab('add-lead')}
                         >
                           <div className="flex items-center gap-3">
-                            <Plus className="h-5 w-5" />
+                            <UserPlus className="h-5 w-5" />
                             <span>Add New Lead</span>
                           </div>
                           <ChevronRight className="h-4 w-4" />
@@ -540,11 +543,11 @@ export default function AgentPortalPage() {
                         <Button 
                           variant="outline"
                           className="w-full h-14 flex items-center justify-between hover:bg-blue-50"
-                          onClick={() => window.location.href = '/calendar'}
+                          onClick={() => setActiveTab('calendar')}
                         >
                           <div className="flex items-center gap-3">
                             <Calendar className="h-5 w-5" />
-                            <span>Open Calendar</span>
+                            <span>Calendar</span>
                           </div>
                           <ChevronRight className="h-4 w-4" />
                         </Button>
@@ -556,6 +559,17 @@ export default function AgentPortalPage() {
                           <div className="flex items-center gap-3">
                             <FileText className="h-5 w-5" />
                             <span>Create Contract</span>
+                          </div>
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          variant="outline"
+                          className="w-full h-14 flex items-center justify-between hover:bg-purple-50"
+                          onClick={() => setActiveTab('inbox')}
+                        >
+                          <div className="flex items-center gap-3">
+                            <Inbox className="h-5 w-5" />
+                            <span>Inbox</span>
                           </div>
                           <ChevronRight className="h-4 w-4" />
                         </Button>
@@ -1187,6 +1201,36 @@ export default function AgentPortalPage() {
                 </Card>
               </div>
             </TabsContent>
+
+            {/* Calendar Tab */}
+            <TabsContent value="calendar" className="space-y-6">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Calendar Management
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmbeddedCalendar />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Inbox Tab */}
+            <TabsContent value="inbox" className="space-y-6">
+              <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Inbox className="h-5 w-5 text-purple-600" />
+                    Customer Requests
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <EmbeddedInbox />
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </motion.div>
       </div>
@@ -1353,5 +1397,192 @@ function NewLeadForm({ onSubmit }: { onSubmit: (data: any) => void }) {
         </Button>
       </div>
     </form>
+  );
+}
+
+// Embedded Calendar Component for Agent Portal
+function EmbeddedCalendar() {
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [viewMode, setViewMode] = useState<'month' | 'week'>('week');
+  
+  const { data: appointments = [] } = useQuery({
+    queryKey: ['/api/appointments'],
+    staleTime: 60 * 1000,
+  });
+
+  const weekDays = useMemo(() => {
+    const start = new Date(selectedDate);
+    start.setDate(start.getDate() - start.getDay());
+    
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(start);
+      day.setDate(start.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  }, [selectedDate]);
+
+  const getAppointmentsForDay = (date: Date) => {
+    return appointments.filter(appointment => {
+      const appointmentDate = new Date(appointment.scheduledAt);
+      return appointmentDate.toDateString() === date.toDateString();
+    });
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Calendar Overview</h3>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant={viewMode === 'week' ? 'default' : 'outline'}
+            onClick={() => setViewMode('week')}
+          >
+            Week
+          </Button>
+          <Button
+            size="sm"
+            variant={viewMode === 'month' ? 'default' : 'outline'}
+            onClick={() => setViewMode('month')}
+          >
+            Month
+          </Button>
+        </div>
+      </div>
+
+      {viewMode === 'week' && (
+        <div className="grid grid-cols-7 gap-2">
+          {weekDays.map((day, index) => {
+            const dayAppointments = getAppointmentsForDay(day);
+            const isToday = day.toDateString() === new Date().toDateString();
+            
+            return (
+              <div
+                key={index}
+                className={`p-3 border rounded-lg min-h-[120px] ${
+                  isToday ? 'bg-blue-50 border-blue-200' : 'bg-white hover:bg-gray-50'
+                }`}
+              >
+                <div className={`text-sm font-medium mb-2 ${isToday ? 'text-blue-600' : 'text-gray-600'}`}>
+                  {day.toLocaleDateString('en-US', { weekday: 'short' })}
+                </div>
+                <div className={`text-lg font-bold mb-2 ${isToday ? 'text-blue-600' : ''}`}>
+                  {day.getDate()}
+                </div>
+                <div className="space-y-1">
+                  {dayAppointments.slice(0, 2).map((appointment, idx) => (
+                    <div
+                      key={idx}
+                      className="text-xs bg-blue-100 text-blue-800 p-1 rounded truncate"
+                      title={appointment.title}
+                    >
+                      {new Date(appointment.scheduledAt).toLocaleTimeString('en-US', { 
+                        hour: 'numeric', 
+                        minute: '2-digit' 
+                      })} {appointment.title}
+                    </div>
+                  ))}
+                  {dayAppointments.length > 2 && (
+                    <div className="text-xs text-gray-500">+{dayAppointments.length - 2} more</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Embedded Inbox Component for Agent Portal
+function EmbeddedInbox() {
+  const { data: propertyInquiries = [] } = useQuery({
+    queryKey: ['/api/property-inquiries'],
+    staleTime: 60 * 1000,
+  });
+
+  const { data: homeValuations = [] } = useQuery({
+    queryKey: ['/api/home-valuations'],
+    staleTime: 60 * 1000,
+  });
+
+  const allRequests = useMemo(() => {
+    const requests = [];
+    
+    propertyInquiries.forEach(inquiry => {
+      requests.push({
+        id: inquiry.id,
+        type: 'property',
+        title: `Property Inquiry - ${inquiry.propertyTitle || 'Unknown Property'}`,
+        name: inquiry.name,
+        email: inquiry.email,
+        timestamp: inquiry.createdAt,
+        status: inquiry.status || 'new',
+        priority: inquiry.priority || 'medium'
+      });
+    });
+
+    homeValuations.forEach(valuation => {
+      requests.push({
+        id: valuation.id,
+        type: 'valuation',
+        title: `Home Valuation - ${valuation.address}`,
+        name: valuation.contactName,
+        email: valuation.email,
+        timestamp: valuation.createdAt,
+        status: valuation.status || 'pending',
+        priority: 'high'
+      });
+    });
+
+    return requests.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+  }, [propertyInquiries, homeValuations]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'new': return 'bg-blue-100 text-blue-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'completed': return 'bg-green-100 text-green-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <h3 className="text-lg font-semibold">Recent Requests</h3>
+        <Badge variant="secondary">{allRequests.length} total</Badge>
+      </div>
+
+      <div className="space-y-3 max-h-[400px] overflow-auto">
+        {allRequests.slice(0, 10).map((request) => (
+          <div
+            key={`${request.type}-${request.id}`}
+            className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+          >
+            <div className="flex justify-between items-start mb-2">
+              <h4 className="font-medium text-sm">{request.title}</h4>
+              <Badge className={getStatusColor(request.status)}>
+                {request.status}
+              </Badge>
+            </div>
+            <p className="text-sm text-gray-600 mb-2">
+              From: {request.name} • {request.email}
+            </p>
+            <p className="text-xs text-gray-500">
+              {new Date(request.timestamp).toLocaleString()}
+            </p>
+          </div>
+        ))}
+        {allRequests.length === 0 && (
+          <div className="text-center py-8 text-gray-500">
+            No requests found
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
