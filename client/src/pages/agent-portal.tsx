@@ -1514,15 +1514,15 @@ function EmbeddedCalendar() {
 
   const getAppointmentsForDay = (date: Date) => {
     return appointments.filter(appointment => {
-      const appointmentDate = new Date(appointment.scheduledAt);
+      const appointmentDate = new Date(appointment.scheduledDate);
       return appointmentDate.toDateString() === date.toDateString();
     }).filter(appointment => {
       if (filterType === 'all') return true;
       return appointment.type === filterType;
     }).filter(appointment => {
       if (!searchTerm) return true;
-      return appointment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-             appointment.description?.toLowerCase().includes(searchTerm.toLowerCase());
+      return appointment.notes?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             appointment.type?.toLowerCase().includes(searchTerm.toLowerCase());
     });
   };
 
@@ -1606,6 +1606,7 @@ function EmbeddedCalendar() {
             <DialogContent className="max-w-2xl">
               <DialogHeader>
                 <DialogTitle>Create New Appointment</DialogTitle>
+                <p className="text-sm text-gray-600">Schedule a new appointment with leads and properties</p>
               </DialogHeader>
               <AppointmentForm
                 onSubmit={createAppointmentMutation.mutate}
@@ -1685,10 +1686,10 @@ function EmbeddedCalendar() {
                         className={`text-xs p-1 rounded truncate text-white ${typeConfig.color}`}
                         title={appointment.title}
                       >
-                        {new Date(appointment.scheduledAt).toLocaleTimeString('en-US', { 
+                        {new Date(appointment.scheduledDate).toLocaleTimeString('en-US', { 
                           hour: 'numeric', 
                           minute: '2-digit' 
-                        })} {appointment.title}
+                        })} {appointment.type}
                       </div>
                     );
                   })}
@@ -1699,6 +1700,116 @@ function EmbeddedCalendar() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Month View */}
+      {viewMode === 'month' && (
+        <div className="grid grid-cols-7 gap-1">
+          {DAYS.map((day) => (
+            <div key={day} className="p-2 text-center font-medium text-gray-600 bg-gray-50">
+              {day}
+            </div>
+          ))}
+          {monthDays.map((day, index) => {
+            const dayAppointments = getAppointmentsForDay(day);
+            const isToday = day.toDateString() === new Date().toDateString();
+            const isCurrentMonth = day.getMonth() === currentDate.getMonth();
+            
+            return (
+              <div
+                key={index}
+                className={`p-2 border min-h-[100px] cursor-pointer transition-colors ${
+                  isToday 
+                    ? 'bg-blue-50 border-blue-200' 
+                    : isCurrentMonth 
+                      ? 'bg-white hover:bg-gray-50' 
+                      : 'bg-gray-50 text-gray-400'
+                }`}
+                onClick={() => setSelectedDate(day)}
+              >
+                <div className={`text-sm font-medium mb-1 ${isToday ? 'text-blue-600' : ''}`}>
+                  {day.getDate()}
+                </div>
+                <div className="space-y-1">
+                  {dayAppointments.slice(0, 2).map((appointment, idx) => {
+                    const typeConfig = getAppointmentTypeConfig(appointment.type);
+                    return (
+                      <div
+                        key={idx}
+                        className={`text-xs p-1 rounded truncate text-white ${typeConfig.color}`}
+                        title={appointment.title}
+                      >
+                        {appointment.type}
+                      </div>
+                    );
+                  })}
+                  {dayAppointments.length > 2 && (
+                    <div className="text-xs text-gray-500">+{dayAppointments.length - 2}</div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Day View */}
+      {viewMode === 'day' && (
+        <div className="space-y-4">
+          <div className="text-center bg-gray-50 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold">
+              {selectedDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric',
+                year: 'numeric'
+              })}
+            </h3>
+          </div>
+          <div className="space-y-2">
+            {getAppointmentsForDay(selectedDate).map((appointment, idx) => {
+              const typeConfig = getAppointmentTypeConfig(appointment.type);
+              const IconComponent = typeConfig.icon;
+              
+              return (
+                <div
+                  key={idx}
+                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`p-2 rounded-lg ${typeConfig.color}`}>
+                      <IconComponent className="h-4 w-4 text-white" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="font-medium">{appointment.type}</h4>
+                      <p className="text-sm text-gray-600">{appointment.notes}</p>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {new Date(appointment.scheduledDate).toLocaleTimeString()}
+                        </span>
+                        {appointment.location && (
+                          <span className="flex items-center gap-1">
+                            <MapPin className="h-3 w-3" />
+                            {appointment.location}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="capitalize">
+                      {appointment.status}
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+            {getAppointmentsForDay(selectedDate).length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No appointments scheduled for this day
+              </div>
+            )}
+          </div>
         </div>
       )}
 
@@ -1729,12 +1840,12 @@ function EmbeddedCalendar() {
                         <IconComponent className="h-4 w-4 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-medium">{appointment.title}</h4>
-                        <p className="text-sm text-gray-600">{appointment.description}</p>
+                        <h4 className="font-medium">{appointment.type}</h4>
+                        <p className="text-sm text-gray-600">{appointment.notes}</p>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                           <span className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            {new Date(appointment.scheduledAt).toLocaleString()}
+                            {new Date(appointment.scheduledDate).toLocaleString()}
                           </span>
                           {appointment.location && (
                             <span className="flex items-center gap-1">
@@ -2099,6 +2210,7 @@ function EmbeddedInbox() {
         <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>Reply to Request</DialogTitle>
+            <p className="text-sm text-gray-600">Send a response to the customer request</p>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -2131,7 +2243,7 @@ function AppointmentForm({ onSubmit, leads, properties, selectedDate, appointmen
     title: '',
     description: '',
     type: 'client_meeting',
-    scheduledAt: selectedDate ? selectedDate.toISOString().slice(0, 16) : '',
+    scheduledDate: selectedDate ? selectedDate.toISOString().slice(0, 16) : '',
     location: '',
     leadId: '',
     propertyId: '',
@@ -2142,9 +2254,9 @@ function AppointmentForm({ onSubmit, leads, properties, selectedDate, appointmen
     e.preventDefault();
     onSubmit({
       ...formData,
-      scheduledAt: new Date(formData.scheduledAt).toISOString(),
-      leadId: formData.leadId ? parseInt(formData.leadId) : null,
-      propertyId: formData.propertyId ? parseInt(formData.propertyId) : null,
+      scheduledDate: new Date(formData.scheduledDate).toISOString(),
+      leadId: formData.leadId && formData.leadId !== 'none' ? parseInt(formData.leadId) : null,
+      propertyId: formData.propertyId && formData.propertyId !== 'none' ? parseInt(formData.propertyId) : null,
     });
   };
 
@@ -2191,12 +2303,12 @@ function AppointmentForm({ onSubmit, leads, properties, selectedDate, appointmen
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <Label htmlFor="scheduledAt">Date & Time</Label>
+          <Label htmlFor="scheduledDate">Date & Time</Label>
           <Input
-            id="scheduledAt"
+            id="scheduledDate"
             type="datetime-local"
-            value={formData.scheduledAt}
-            onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
+            value={formData.scheduledDate}
+            onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
             required
           />
         </div>
@@ -2219,7 +2331,7 @@ function AppointmentForm({ onSubmit, leads, properties, selectedDate, appointmen
               <SelectValue placeholder="Select lead" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No lead</SelectItem>
+              <SelectItem value="none">No lead</SelectItem>
               {leads.map(lead => (
                 <SelectItem key={lead.id} value={lead.id.toString()}>
                   {lead.firstName} {lead.lastName}
@@ -2235,7 +2347,7 @@ function AppointmentForm({ onSubmit, leads, properties, selectedDate, appointmen
               <SelectValue placeholder="Select property" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No property</SelectItem>
+              <SelectItem value="none">No property</SelectItem>
               {properties.map(property => (
                 <SelectItem key={property.id} value={property.id.toString()}>
                   {property.title}

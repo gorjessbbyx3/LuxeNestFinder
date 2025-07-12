@@ -469,6 +469,8 @@ export const insertAppointmentSchema = createInsertSchema(appointments).omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+}).extend({
+  scheduledDate: z.coerce.date()
 });
 
 export const insertContractSchema = createInsertSchema(contracts).omit({
