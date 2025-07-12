@@ -7,6 +7,7 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 import { 
   MapPin, 
   Plus, 
@@ -201,7 +202,14 @@ export default function AdvancedPropertyMap() {
   const [showInvestmentData, setShowInvestmentData] = useState(true);
   const [showLifestyleScores, setShowLifestyleScores] = useState(true);
   const [mapView, setMapView] = useState<"satellite" | "terrain" | "luxury">("luxury");
+  const [showParcelData, setShowParcelData] = useState(false);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch real Hawaii State parcel data for luxury properties
+  const { data: hawaiiParcels, isLoading: parcelsLoading } = useQuery({
+    queryKey: ["/api/hawaii-parcels/luxury", { minValue: priceRange[0] }],
+    enabled: showParcelData
+  });
 
   const filteredProperties = eliteHawaiiProperties.filter(property => {
     const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
@@ -354,6 +362,14 @@ export default function AdvancedPropertyMap() {
                   onCheckedChange={setShowLifestyleScores}
                 />
                 <Label htmlFor="lifestyle" className="text-sm">Lifestyle Scores</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="parcels" 
+                  checked={showParcelData}
+                  onCheckedChange={setShowParcelData}
+                />
+                <Label htmlFor="parcels" className="text-sm">Official Parcel Data</Label>
               </div>
             </div>
           </div>
@@ -609,10 +625,39 @@ export default function AdvancedPropertyMap() {
                 <div className="text-center">
                   <div className="text-xl font-bold">{filteredProperties.length}</div>
                   <div className="text-xs">Elite Properties</div>
+                  {showParcelData && hawaiiParcels && (
+                    <>
+                      <div className="text-sm font-bold mt-2">{hawaiiParcels.length}</div>
+                      <div className="text-xs">Official Parcels</div>
+                    </>
+                  )}
                 </div>
               </CardContent>
             </Card>
           </div>
+
+          {/* Official Parcel Overlay */}
+          {showParcelData && hawaiiParcels && (
+            <div className="absolute top-20 left-6 max-w-xs z-10">
+              <Card className="bg-green-600/90 backdrop-blur-sm text-white border-0">
+                <CardContent className="p-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse" />
+                    <span className="text-sm font-semibold">Hawaii State Data</span>
+                  </div>
+                  <div className="text-xs space-y-1">
+                    <div>✓ Official TMK Parcels</div>
+                    <div>✓ Government Assessed Values</div>
+                    <div>✓ Zoning & Land Use Data</div>
+                    <div>✓ Real Property Boundaries</div>
+                  </div>
+                  {parcelsLoading && (
+                    <div className="text-xs mt-1 opacity-75">Loading parcel data...</div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
       </Card>
     </motion.div>

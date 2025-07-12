@@ -12,6 +12,7 @@ import {
   insertMarketingCampaignSchema
 } from "@shared/schema";
 import { generatePropertyDescription } from "./lib/openai";
+import { hawaiiParcelService } from "./lib/hawaii-parcels";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -478,6 +479,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error searching leads:", error);
       res.status(500).json({ message: "Search failed" });
+    }
+  });
+
+  // Hawaii State Parcel Data Integration - Official Government Source
+  app.get("/api/hawaii-parcels/luxury", async (req, res) => {
+    try {
+      const { minValue = 2000000 } = req.query;
+      const luxuryParcels = await hawaiiParcelService.getLuxuryParcels(Number(minValue));
+      res.json(luxuryParcels);
+    } catch (error) {
+      console.error("Error fetching luxury parcels:", error);
+      res.status(500).json({ error: "Failed to fetch luxury parcel data" });
+    }
+  });
+
+  app.get("/api/hawaii-parcels/by-bounds", async (req, res) => {
+    try {
+      const { minLat, maxLat, minLng, maxLng, county } = req.query;
+      
+      if (!minLat || !maxLat || !minLng || !maxLng) {
+        return res.status(400).json({ error: "Missing required boundary parameters" });
+      }
+      
+      const parcels = await hawaiiParcelService.getParcelsByBounds(
+        Number(minLat),
+        Number(maxLat), 
+        Number(minLng),
+        Number(maxLng),
+        county ? String(county) : undefined
+      );
+      
+      res.json(parcels);
+    } catch (error) {
+      console.error("Error fetching parcels by bounds:", error);
+      res.status(500).json({ error: "Failed to fetch parcel data" });
+    }
+  });
+
+  app.get("/api/hawaii-parcels/tmk/:tmk", async (req, res) => {
+    try {
+      const { tmk } = req.params;
+      const parcel = await hawaiiParcelService.getParcelByTMK(tmk);
+      
+      if (!parcel) {
+        return res.status(404).json({ error: "Parcel not found" });
+      }
+      
+      res.json(parcel);
+    } catch (error) {
+      console.error("Error fetching parcel by TMK:", error);
+      res.status(500).json({ error: "Failed to fetch parcel data" });
+    }
+  });
+
+  app.post("/api/hawaii-parcels/enrich-property", async (req, res) => {
+    try {
+      const { lat, lng, radius = 0.001 } = req.body;
+      
+      if (!lat || !lng) {
+        return res.status(400).json({ error: "Missing latitude or longitude" });
+      }
+      
+      const enrichmentData = await hawaiiParcelService.enrichPropertyWithParcelData(
+        Number(lat),
+        Number(lng),
+        Number(radius)
+      );
+      
+      res.json(enrichmentData);
+    } catch (error) {
+      console.error("Error enriching property with parcel data:", error);
+      res.status(500).json({ error: "Failed to enrich property data" });
     }
   });
 
