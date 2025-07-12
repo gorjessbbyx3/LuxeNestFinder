@@ -2,7 +2,7 @@ import Navigation from "@/components/navigation";
 import HeroSection from "@/components/hero-section";
 import PropertySearch from "@/components/property-search";
 import PropertyCard from "@/components/property-card";
-import MapSearch from "@/components/map-search";
+import RealLocationMap from "@/components/real-location-map";
 import VirtualTourViewer from "@/components/virtual-tour-viewer";
 import AIChat from "@/components/ai-chat";
 import PropertyComparison from "@/components/property-comparison";
@@ -110,14 +110,14 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-6 text-primary">
-              Interactive Map Search
+              Real Geographic Locations
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Explore Hawaii's luxury real estate market with our AI-powered map featuring live filters, heatmaps, and instant property insights.
+              Explore actual property locations with precise GPS coordinates across all Hawaiian islands - from Diamond Head to Princeville.
             </p>
           </motion.div>
           
-          <MapSearch />
+          <RealLocationMap />
         </div>
       </section>
 

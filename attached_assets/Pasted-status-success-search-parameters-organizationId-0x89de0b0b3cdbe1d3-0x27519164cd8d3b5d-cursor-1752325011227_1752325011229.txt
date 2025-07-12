@@ -1,0 +1,211 @@
+status:"success"
+search_parameters:
+organizationId:"0x89de0b0b3cdbe1d3:0x27519164cd8d3b5d"
+cursor:"CAESdkNBRVFDaHBTUTJkblNVRm9TVUZIUVVWcFFVRnZlRU5CUlZOTFVXOUxRVVF0WDNsM1IxWmZabDlmWDNoSlVWRmhWVGczTjJSNE1scFJMV3hMVmpOQlFVRkJRVUp2U2w5a2EzUkJia1UwU2pWYVUwZEJRV2xCUVE="
+geo:"us"
+hl:"en"
+data:
+cursor:"CAESdkNBRVFGQnBTUTJkblNVRm9TVUZIUVVWcFFVRnZlRU5CUlZOTFVXOUxRVVF0WDNsM1lWcERVRjlmWDNoSlVWWm9kMngwVmxSZmQwOVZOamhhV1hsQlFVRkJRVUp2U2w5a2JuaEJibTVKVFV4MU5rZEJRV2xCUVE="
+records:0:contributor:
+id:"111079351174471659190"
+name:"Debra"
+profile_picture_url:"https://lh3.googleusercontent.com/a/ACg8ocIv7LMs8rxdebafONvvQXxng9DFYphvjUbj044l-gr_z9RHBw=s120-c-rp-mo-br100"
+profile_url:"https://www.google.com/maps/contrib/111079351174471659190?hl=en"
+review_count:2
+review:
+utc_publish_date:"2023-11-30T15:57:06.058Z"
+utc_last_modified_date:"2023-11-30T17:35:44.382Z"
+rating:1
+comment:"Had a service call placed and company cancelled 2 days out. Upon arrival one tech struggled with removing nut from tub faucet so the other attempted and broke all copper pipes in wall. Claiming the cause was old pipes and not the force of removing nut. Owner stated it is my responsibility for additional 920.00 for them breaking copper pipes. If this company is called make sure you ask the most important question. If you break something that was previously intact am I responsible? Poor businessman and poor customer relations !\nIn response to owner, the 3 copper pipes were intact prior to tech visit, we all could see corrosion on that nut so I think and alternative route should have been assessed before forcing the nut off resulting in copper pipes being completely severed at would have been at my expense and yes I refused your company service because it went from 427 to over 1300. And yes, poor review this is free speech"
+lang:"en"
+photos:
+response:
+utc_publish_date:"2023-11-30T16:44:47.141Z"
+utc_last_modified_date:"2023-11-30T17:17:35.470Z"
+comment:"Debra, I\'m very sorry that you are dissatisfied with the service provided in which you were not charged for. The technician applied pressure to the antiquated and corroded shower valve in an attempt to replace the inner parts rather than having to replace the entire shower valve. When doing so the control lever broke off the actual shower valve body (factory connected) and not the copper pipes in the wall. The thin copper tubing between the shower valve body and the control lever did twist off due to the nut being corroded and stuck on the lever assembly. The shower valve body is still attached to the unbroken copper pipes in the wall. There is no way to disassemble the shower valve assembly without removing the nut which clearly was not going to loosen with less pressure. Subsequently the only option is to replace the entire shower valve body and trim which is the more expensive option in which the technician was trying to save you from having to do. However, due to the age and condition, that wasn\'t possible. You chose not to have us install a new shower valve which we gladly would\'ve done immediately. Either way, it still has to be replaced as does any other 30 plus year old fixture that malfunctions. So we get the bad review for showing up to help you with your old plumbing that that would\'ve fallen apart no matter who tried to disassemble it. "
+lang:"en"
+1:contributor:
+id:"111252172671739997226"
+name:"Linda P"
+profile_picture_url:"https://lh3.googleusercontent.com/a-/ALV-UjXhc50vMEL8_M167D0pOq_4wd4HycSsWx3k0Tlm4zEAIncRk2re=s120-c-rp-mo-ba4-br100"
+profile_url:"https://www.google.com/maps/contrib/111252172671739997226?hl=en"
+review_count:106
+review:
+utc_publish_date:"2020-11-15T00:14:52.602Z"
+utc_last_modified_date:"2020-12-18T15:58:35.528Z"
+rating:5
+comment:"New to this group, very happy with the service, install, and speed of my appointment.\nGreat group to deal with. Their proximity to my property is also a huge plus. My service tech Ben, was awesome!! Look forward to working with these guys again on a larger project.\nUpdated pix show before installation of a German gravity fed hot water heater and after Empire State Plumbing’s Install.\nWonderful group.\nSee you in 2021 Ben for more projects."
+lang:"en"
+photos:0:
+thumbnail:"https://lh5.googleusercontent.com/p/AF1QipOKXdPOkD-wNc1R_s6B4PAU6rZcCdDXDvCSxeT9=w100-h100-k-no-p"
+small:"https://lh5.googleusercontent.com/p/AF1QipOKXdPOkD-wNc1R_s6B4PAU6rZcCdDXDvCSxeT9=w400-h400-k-no-p"
+medium:"https://lh5.googleusercontent.com/p/AF1QipOKXdPOkD-wNc1R_s6B4PAU6rZcCdDXDvCSxeT9=w800-h800-k-no-p"
+large:"https://lh5.googleusercontent.com/p/AF1QipOKXdPOkD-wNc1R_s6B4PAU6rZcCdDXDvCSxeT9=w1600-h1600-k-no-p"
+xl:"https://lh5.googleusercontent.com/p/AF1QipOKXdPOkD-wNc1R_s6B4PAU6rZcCdDXDvCSxeT9=w2400-h2400-k-no-p"
+1:
+thumbnail:"https://lh5.googleusercontent.com/p/AF1QipPKrBkXjpLp3hvPdnSjxAPQr6UPYv3UBPATeHnb=w100-h100-k-no-p"
+small:"https://lh5.googleusercontent.com/p/AF1QipPKrBkXjpLp3hvPdnSjxAPQr6UPYv3UBPATeHnb=w400-h400-k-no-p"
+medium:"https://lh5.googleusercontent.com/p/AF1QipPKrBkXjpLp3hvPdnSjxAPQr6UPYv3UBPATeHnb=w800-h800-k-no-p"
+large:"https://lh5.googleusercontent.com/p/AF1QipPKrBkXjpLp3hvPdnSjxAPQr6UPYv3UBPATeHnb=w1600-h1600-k-no-p"
+xl:"https://lh5.googleusercontent.com/p/AF1QipPKrBkXjpLp3hvPdnSjxAPQr6UPYv3UBPATeHnb=w2400-h2400-k-no-p"
+2:
+thumbnail:"https://lh5.googleusercontent.com/p/AF1QipN9x5cnb0nXL1FRbD4D_1JXyfi9qlFERfShTGoy=w100-h100-k-no-p"
+small:"https://lh5.googleusercontent.com/p/AF1QipN9x5cnb0nXL1FRbD4D_1JXyfi9qlFERfShTGoy=w400-h400-k-no-p"
+medium:"https://lh5.googleusercontent.com/p/AF1QipN9x5cnb0nXL1FRbD4D_1JXyfi9qlFERfShTGoy=w800-h800-k-no-p"
+large:"https://lh5.googleusercontent.com/p/AF1QipN9x5cnb0nXL1FRbD4D_1JXyfi9qlFERfShTGoy=w1600-h1600-k-no-p"
+xl:"https://lh5.googleusercontent.com/p/AF1QipN9x5cnb0nXL1FRbD4D_1JXyfi9qlFERfShTGoy=w2400-h2400-k-no-p"
+response:
+utc_publish_date:"2020-11-19T15:26:12.856Z"
+utc_last_modified_date:"2020-11-19T15:26:12.856Z"
+comment:"Thank you Linda. We\'re grateful for our customers and the reviews. We look forward to working with you as well."
+lang:"en"
+2:contributor:
+id:"115440211772623970034"
+name:"Patrick Young"
+profile_picture_url:"https://lh3.googleusercontent.com/a-/ALV-UjUBfv6cR4Lf1kiUDmOOYQyZsmz0YmPX0A612suQT2PbauIKH1bm=s120-c-rp-mo-br100"
+profile_url:"https://www.google.com/maps/contrib/115440211772623970034?hl=en"
+review_count:8
+review:
+utc_publish_date:"2023-01-05T22:04:33.626Z"
+utc_last_modified_date:"2023-01-05T22:04:33.626Z"
+rating:5
+comment:"Justin and Albert came out due to a burst pipe in the winter as well as our need to replace our hot water heater. They were on-time for the appointment, and didn’t try to upsell to more expensive options that we didn’t need. The work was done quickly and were able to get a new water heater the same day and get it installed.\n\nWe have an old house, and unlike another plumber in the area, Empire’s plumbers were both understanding and realistic about the work we needed done. Because of that, they will be our first call in the future for maintenance and other installs/repairs."
+lang:"en"
+photos:0:
+thumbnail:"https://lh5.googleusercontent.com/p/AF1QipP2vlzy_X4DExVQxyPk0L089MsO31Sc-6_KWMTE=w100-h100-k-no-p"
+small:"https://lh5.googleusercontent.com/p/AF1QipP2vlzy_X4DExVQxyPk0L089MsO31Sc-6_KWMTE=w400-h400-k-no-p"
+medium:"https://lh5.googleusercontent.com/p/AF1QipP2vlzy_X4DExVQxyPk0L089MsO31Sc-6_KWMTE=w800-h800-k-no-p"
+large:"https://lh5.googleusercontent.com/p/AF1QipP2vlzy_X4DExVQxyPk0L089MsO31Sc-6_KWMTE=w1600-h1600-k-no-p"
+xl:"https://lh5.googleusercontent.com/p/AF1QipP2vlzy_X4DExVQxyPk0L089MsO31Sc-6_KWMTE=w2400-h2400-k-no-p"
+response:
+utc_publish_date:"2024-05-08T14:26:38.773Z"
+utc_last_modified_date:"2024-05-08T14:26:38.773Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+3:contributor:
+id:"117424703466174607621"
+name:"Josh Mitchell"
+profile_picture_url:"https://lh3.googleusercontent.com/a-/ALV-UjXFoG-L5TcFdXg8cnZQtstLYd3nOWE_BNK6XkoMoV4RK7theBo76Q=s120-c-rp-mo-ba4-br100"
+profile_url:"https://www.google.com/maps/contrib/117424703466174607621?hl=en"
+review_count:45
+review:
+utc_publish_date:"2024-02-28T17:47:52.363Z"
+utc_last_modified_date:"2024-02-28T17:47:52.363Z"
+rating:5
+comment:"I\'ve had Roger out here for two different jobs and he\'s fantastic. Definitely recommend! Ask for him by name! 💪🏻"
+lang:"en"
+photos:
+response:
+utc_publish_date:"2024-05-08T14:26:51.759Z"
+utc_last_modified_date:"2024-05-08T14:26:51.759Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+4:contributor:
+id:"114732544144797495050"
+name:"Geoffrey Jahn"
+profile_picture_url:"https://lh3.googleusercontent.com/a/ACg8ocLL3c4JbKNB8tkZwTj_j2uCrD8P3O98RmAhv9IyjOSvk3DnUQ=s120-c-rp-mo-br100"
+profile_url:"https://www.google.com/maps/contrib/114732544144797495050?hl=en"
+review_count:4
+review:
+utc_publish_date:"2024-04-22T12:57:03.852Z"
+utc_last_modified_date:"2024-04-22T12:57:03.852Z"
+rating:5
+comment:"Rich and Logan did a fantastic job installing a new sump pump for me! Great service and friendly people!"
+lang:"en"
+photos:
+response:
+utc_publish_date:"2024-05-08T14:27:02.588Z"
+utc_last_modified_date:"2024-05-08T14:27:02.588Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+5:contributor:
+id:"112114285256450556328"
+name:"Doreen Smith-Casale"
+profile_picture_url:"https://lh3.googleusercontent.com/a/ACg8ocIwMAezKx0iZr2XqrERCexnLPNRM7DlUHK0Q2hYZuqOTwUjZg=s120-c-rp-mo-br100"
+profile_url:"https://www.google.com/maps/contrib/112114285256450556328?hl=en"
+review_count:1
+review:
+utc_publish_date:"2023-01-19T14:33:13.918Z"
+utc_last_modified_date:"2023-01-19T14:33:13.918Z"
+rating:5
+comment:"I called for estimate they came out very quick gave me all details and explained everything in detail. Spoke with the main office ,Logan was very helpful and worked with my schedule to get this done as soon as possible Dan was here to install it next day. very efficient explained everything to me in detail showed me how to change out the filter. Dan was very neat cleaned up and all the fitting connections were perfectly done, he also mounted it to the wall so its easily accessible for me to get to. Very pleased with the service will definitely use them again for any plumbing issues we have in the future."
+lang:"en"
+photos:
+response:
+utc_publish_date:"2024-05-08T14:27:15.919Z"
+utc_last_modified_date:"2024-05-08T14:27:15.919Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+6:contributor:
+id:"114691120811795731277"
+name:"LarryLee Fiber"
+profile_picture_url:"https://lh3.googleusercontent.com/a-/ALV-UjX25Uy3cxHXjCs6kD5M5S0esYZ1A6p2Drc2CC6_CxOFdj3PkiY=s120-c-rp-mo-ba3-br100"
+profile_url:"https://www.google.com/maps/contrib/114691120811795731277?hl=en"
+review_count:45
+review:
+utc_publish_date:"2021-03-09T03:06:58.272Z"
+utc_last_modified_date:"2024-01-20T19:03:43.493Z"
+rating:5
+comment:"We needed a new water heater for a mobile home -- a double-wide. There are specific heater requirements in order to be in compliance for a mobile home. So the heaters are more money, and because space is tight, they are tougher to install. Dan & Mike showed up, got to work installing the heater I bought that met code. And even though neither one of them had ever installed a Mobile-Home-specific water heater, in 90 minutes the whole job was DONE! Cleaned-up and rocking! PERFECT! They came less than 24 hours after I placed the SOS call to them. Courteous, quiet, respectful. Amazing!\n\nSince this original post (over two years ago), we have engaged Empire several more times -- for plumbing, hot water, and HVAC. Excellent! Highly recommended!"
+lang:"en"
+photos:
+response:
+utc_publish_date:"2024-05-08T14:27:29.313Z"
+utc_last_modified_date:"2024-05-08T14:27:29.313Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+7:contributor:
+id:"112681906929856931094"
+name:"Andrew Reovan"
+profile_picture_url:"https://lh3.googleusercontent.com/a-/ALV-UjW9LicwktgYHgasTzX-60uOG0ddLgXEa-bshB7vB5qZU6AsRQfaHg=s120-c-rp-mo-ba4-br100"
+profile_url:"https://www.google.com/maps/contrib/112681906929856931094?hl=en"
+review_count:1
+review:
+utc_publish_date:"2023-08-09T13:27:38.269Z"
+utc_last_modified_date:"2023-08-09T13:27:38.269Z"
+rating:5
+comment:"Called Empire on a Sunday when my water heater failed and they were able to get out the next morning to check it out. Keith was great in working with me through options (since I was budgeting to go tankless soon) and in talking through the entire process. The whole team has been very professional and always on time and has helped make sure everything works well."
+lang:"en"
+photos:
+response:
+utc_publish_date:"2024-05-08T14:27:39.769Z"
+utc_last_modified_date:"2024-05-08T14:27:39.769Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+8:contributor:
+id:"102001846426718239064"
+name:"Home Account"
+profile_picture_url:"https://lh3.googleusercontent.com/a/ACg8ocJRrlI0R2wF_hQGwUFpOq-o2svtxJ7nJdP_p4T4ESKmBRNsXA=s120-c-rp-mo-br100"
+profile_url:"https://www.google.com/maps/contrib/102001846426718239064?hl=en"
+review_count:1
+review:
+utc_publish_date:"2024-03-08T13:18:15.942Z"
+utc_last_modified_date:"2024-03-08T13:18:15.942Z"
+rating:5
+comment:"Roger Q helped us with a plumbing situation in north greenbush, was professional, helpful and explained everything. Thanks again."
+lang:"en"
+photos:
+response:
+utc_publish_date:"2024-05-08T14:27:48.523Z"
+utc_last_modified_date:"2024-05-08T14:27:48.523Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+9:contributor:
+id:"104090489992757855252"
+name:"Steven DiGiorgi"
+profile_picture_url:"https://lh3.googleusercontent.com/a/ACg8ocLTw6j9hl6pcQk5-3sjMAVuz39B4giHE3cs2g7N7ZTGivZ4lw=s120-c-rp-mo-br100"
+profile_url:"https://www.google.com/maps/contrib/104090489992757855252?hl=en"
+review_count:4
+review:
+utc_publish_date:"2023-02-09T20:12:55.749Z"
+utc_last_modified_date:"2023-02-09T20:12:55.749Z"
+rating:5
+comment:"Empire State Plumbing was very reliable, on-time, and the technician, Dan, was very thorough in solving the plumbing issue and then repairing it. Furthermore, he left me his personal cell number to call him if the repair faulted - which it did not. Very comforting to know that Empire assures customers that they stand by their work product."
+lang:"en"
+photos:
+response:
+utc_publish_date:"2024-05-08T14:27:59.361Z"
+utc_last_modified_date:"2024-05-08T14:27:59.361Z"
+comment:"Thank you so much for taking the time to leave us such a wonderful review! We\'re thrilled to hear that you had a great experience with Empire State Plumbing. Our team works hard to provide top-notch service, and it\'s incredibly rewarding to know that we\'ve met your expectations. If you ever need assistance again in the future, don\'t hesitate to reach out. We\'re here to help!"
+lang:"en"
+is_end:false
