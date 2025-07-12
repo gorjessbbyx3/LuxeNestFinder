@@ -650,6 +650,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/mls/photos/:mlsNumber", async (req, res) => {
+    try {
+      const { mlsNumber } = req.params;
+      const listing = await hiCentralMLSService.getPropertyByMLS(mlsNumber);
+      
+      if (!listing) {
+        return res.status(404).json({ error: "MLS listing not found" });
+      }
+      
+      res.json({
+        mlsNumber: listing.mlsNumber,
+        address: listing.address,
+        photos: listing.photos,
+        totalPhotos: listing.photos.length,
+        listPrice: listing.listPrice,
+        propertyType: listing.propertyType
+      });
+    } catch (error) {
+      console.error("Error fetching MLS photos:", error);
+      res.status(500).json({ error: "Failed to fetch MLS photos" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

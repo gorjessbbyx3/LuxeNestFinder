@@ -99,7 +99,13 @@ export class HiCentralMLSService {
           airConditioning: true,
           parking: 2,
         },
-        photos: ['https://s3.amazonaws.com/photos.re.parallel21.com/51/202515151_00.jpg'],
+        photos: [
+          'https://s3.amazonaws.com/photos.re.parallel21.com/51/202515151_00.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/51/202515151_01.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/51/202515151_02.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/51/202515151_03.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/51/202515151_04.jpg'
+        ],
         description: 'Spectacular Park Lane luxury condominium with panoramic ocean views from the 34th floor.',
         coordinates: {
           lat: 21.2909,
@@ -132,7 +138,14 @@ export class HiCentralMLSService {
           airConditioning: true,
           garage: 2,
         },
-        photos: ['https://s3.amazonaws.com/photos.re.parallel21.com/10/202515310_00.jpg'],
+        photos: [
+          'https://s3.amazonaws.com/photos.re.parallel21.com/10/202515310_00.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/10/202515310_01.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/10/202515310_02.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/10/202515310_03.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/10/202515310_04.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/10/202515310_05.jpg'
+        ],
         description: 'Exquisite beachfront estate in world-famous Lanikai with private beach access.',
         coordinates: {
           lat: 21.3950,
@@ -165,7 +178,15 @@ export class HiCentralMLSService {
           airConditioning: true,
           garage: 2,
         },
-        photos: ['https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_00.jpg'],
+        photos: [
+          'https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_00.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_01.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_02.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_03.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_04.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_05.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/02/202515002_06.jpg'
+        ],
         description: 'Prestigious Diamond Head estate with stunning ocean and crater views.',
         coordinates: {
           lat: 21.2642,
@@ -204,7 +225,14 @@ export class HiCentralMLSService {
           airConditioning: true,
           garage: 3,
         },
-        photos: ['https://s3.amazonaws.com/photos.re.parallel21.com/64/202515864_00.jpg'],
+        photos: [
+          'https://s3.amazonaws.com/photos.re.parallel21.com/64/202515864_00.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/64/202515864_01.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/64/202515864_02.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/64/202515864_03.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/64/202515864_04.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/64/202515864_05.jpg'
+        ],
         description: 'Magnificent Hawaii Loa Ridge estate with breathtaking panoramic views.',
         coordinates: {
           lat: 21.2876,
@@ -236,7 +264,12 @@ export class HiCentralMLSService {
           airConditioning: false,
           parking: 2,
         },
-        photos: ['https://s3.amazonaws.com/photos.re.parallel21.com/82/202511582_00.jpg'],
+        photos: [
+          'https://s3.amazonaws.com/photos.re.parallel21.com/82/202511582_00.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/82/202511582_01.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/82/202511582_02.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/82/202511582_03.jpg'
+        ],
         description: 'Charming North Shore beachfront property with direct ocean access.',
         coordinates: {
           lat: 21.5769,
@@ -275,7 +308,13 @@ export class HiCentralMLSService {
           airConditioning: true,
           parking: 6,
         },
-        photos: ['https://s3.amazonaws.com/photos.re.parallel21.com/40/202515740_00.jpg'],
+        photos: [
+          'https://s3.amazonaws.com/photos.re.parallel21.com/40/202515740_00.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/40/202515740_01.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/40/202515740_02.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/40/202515740_03.jpg',
+          'https://s3.amazonaws.com/photos.re.parallel21.com/40/202515740_04.jpg'
+        ],
         description: 'Unique multi-family compound perfect for large families or investment.',
         coordinates: {
           lat: 21.3364,
