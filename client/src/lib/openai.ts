@@ -41,7 +41,7 @@ export async function analyzePropertyLifestyle(
     budget?: number;
     propertyType?: string;
   }
-): Promise<PropertyAnalysis> {
+): Promise<PropertyAnalysis | null> {
   try {
     const response = await fetch('/api/ai/lifestyle-match', {
       method: 'POST',
@@ -59,25 +59,17 @@ export async function analyzePropertyLifestyle(
     const analysis = await response.json();
     
     return {
-      lifestyleScore: analysis.lifestyleMatch || 85,
-      investmentScore: analysis.investmentScore || 78,
-      marketValueScore: analysis.marketValueScore || 92,
-      reasoning: analysis.reasoning || 'Property shows strong compatibility with your lifestyle preferences',
-      highlights: analysis.highlights || ['Great location', 'Premium amenities', 'Investment potential'],
+      lifestyleScore: analysis.lifestyleMatch,
+      investmentScore: analysis.investmentScore,
+      marketValueScore: analysis.marketValueScore,
+      reasoning: analysis.reasoning,
+      highlights: analysis.highlights,
     };
   } catch (error) {
     console.error('Error analyzing property lifestyle:', error);
     
-    // Fallback analysis based on basic matching
-    const lifestyleScore = calculateBasicLifestyleMatch(propertyData, userPreferences);
-    
-    return {
-      lifestyleScore,
-      investmentScore: 78,
-      marketValueScore: 85,
-      reasoning: 'Basic compatibility analysis completed',
-      highlights: ['Property features', 'Location benefits', 'Market position'],
-    };
+    // Return null when no authentic analysis is available
+    return null;
   }
 }
 
@@ -154,44 +146,27 @@ export async function getAIPropertyRecommendations(
   }
 }
 
-// Analyze neighborhood insights
+// Analyze neighborhood insights using authentic data only
 export async function analyzeNeighborhood(
   neighborhoodName: string,
   city: string
-): Promise<NeighborhoodInsights> {
+): Promise<NeighborhoodInsights | null> {
   try {
-    // This would integrate with external APIs for real neighborhood data
-    // For now, return calculated insights based on available data
-    
-    const baseInsights: NeighborhoodInsights = {
-      safetyScore: 8.5 + Math.random() * 1.5,
-      schoolRating: 7.5 + Math.random() * 2.5,
-      walkabilityScore: 6.0 + Math.random() * 4.0,
-      luxuryScore: 8.0 + Math.random() * 2.0,
-      investmentGrowth: 5.0 + Math.random() * 15.0,
-      keyFeatures: [
-        'Luxury amenities',
-        'Premium dining',
-        'Beach access',
-        'Golf courses',
-        'Shopping centers'
-      ],
-      description: `${neighborhoodName} offers an exceptional blend of luxury living and Hawaiian lifestyle, featuring world-class amenities, stunning natural beauty, and strong investment potential.`
-    };
+    const response = await fetch('/api/neighborhoods/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ neighborhoodName, city }),
+    });
 
-    return baseInsights;
+    if (!response.ok) {
+      throw new Error('Failed to analyze neighborhood data');
+    }
+
+    const analysis = await response.json();
+    return analysis;
   } catch (error) {
     console.error('Error analyzing neighborhood:', error);
-    
-    return {
-      safetyScore: 8.0,
-      schoolRating: 8.0,
-      walkabilityScore: 7.0,
-      luxuryScore: 8.5,
-      investmentGrowth: 8.5,
-      keyFeatures: ['Luxury living', 'Great location', 'Premium amenities'],
-      description: 'A premier Hawaiian neighborhood with exceptional lifestyle amenities.',
-    };
+    return null;
   }
 }
 
@@ -286,7 +261,7 @@ function calculateBasicLifestyleMatch(
   return Math.min(Math.max(score, 1), 100);
 }
 
-// Real-time market analysis
+// Real-time market analysis using authentic data only
 export async function getMarketAnalysis(
   city: string,
   propertyType: string
@@ -296,35 +271,23 @@ export async function getMarketAnalysis(
   marketTrend: 'up' | 'down' | 'stable';
   comparableProperties: number;
   timeOnMarket: number;
-}> {
+} | null> {
   try {
-    // This would integrate with real market data APIs
-    // For now, provide calculated estimates
-    
-    const basePrice = propertyType === 'estate' ? 4500000 : 
-                     propertyType === 'condo' ? 1200000 : 2800000;
-    
-    const cityMultiplier = city.toLowerCase().includes('honolulu') ? 1.3 :
-                          city.toLowerCase().includes('maui') ? 1.2 :
-                          city.toLowerCase().includes('kailua') ? 1.15 : 1.0;
-    
-    return {
-      averagePrice: Math.round(basePrice * cityMultiplier),
-      priceGrowth: 5.2 + Math.random() * 8.0,
-      marketTrend: Math.random() > 0.3 ? 'up' : 'stable',
-      comparableProperties: Math.floor(15 + Math.random() * 25),
-      timeOnMarket: Math.floor(30 + Math.random() * 90),
-    };
+    const response = await fetch('/api/market/analysis', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ city, propertyType }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to get market analysis');
+    }
+
+    const analysis = await response.json();
+    return analysis;
   } catch (error) {
     console.error('Error getting market analysis:', error);
-    
-    return {
-      averagePrice: 3200000,
-      priceGrowth: 6.8,
-      marketTrend: 'up',
-      comparableProperties: 24,
-      timeOnMarket: 45,
-    };
+    return null;
   }
 }
 

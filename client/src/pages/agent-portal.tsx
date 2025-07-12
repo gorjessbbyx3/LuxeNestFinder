@@ -16,7 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
 import { 
   Users, 
-  Calendar, 
+  Calendar as CalendarIcon, 
   FileText, 
   DollarSign, 
   TrendingUp, 
@@ -51,7 +51,7 @@ import {
   Settings,
   Inbox,
   UserPlus,
-  User,
+  User as UserIcon,
   Video,
   AlertCircle,
   ChevronLeft,
@@ -313,7 +313,7 @@ export default function AgentPortalPage() {
                 Leads
               </TabsTrigger>
               <TabsTrigger value="calendar" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
-                <Calendar className="h-4 w-4 mr-2" />
+                <CalendarIcon className="h-4 w-4 mr-2" />
                 Calendar
               </TabsTrigger>
               <TabsTrigger value="inbox" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
@@ -321,7 +321,7 @@ export default function AgentPortalPage() {
                 Inbox
               </TabsTrigger>
               <TabsTrigger value="appointments" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
-                <Calendar className="h-4 w-4 mr-2" />
+                <CalendarIcon className="h-4 w-4 mr-2" />
                 Appointments
               </TabsTrigger>
               <TabsTrigger value="contracts" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
@@ -557,7 +557,7 @@ export default function AgentPortalPage() {
                           onClick={() => setActiveTab('calendar')}
                         >
                           <div className="flex items-center gap-3">
-                            <Calendar className="h-5 w-5" />
+                            <CalendarIcon className="h-5 w-5" />
                             <span>Calendar</span>
                           </div>
                           <ChevronRight className="h-4 w-4" />
@@ -737,7 +737,7 @@ export default function AgentPortalPage() {
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold">Appointment Scheduling</h2>
                 <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
-                  <Calendar className="h-4 w-4 mr-2" />
+                  <CalendarIcon className="h-4 w-4 mr-2" />
                   Schedule New Appointment
                 </Button>
               </div>
@@ -745,7 +745,7 @@ export default function AgentPortalPage() {
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <CalendarIcon className="h-5 w-5 text-blue-600" />
                     Upcoming Appointments
                   </CardTitle>
                 </CardHeader>
@@ -756,7 +756,7 @@ export default function AgentPortalPage() {
                     </div>
                   ) : appointments.length === 0 ? (
                     <div className="text-center py-12">
-                      <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                      <CalendarIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                       <h3 className="text-xl font-semibold text-gray-700 mb-2">No appointments scheduled</h3>
                       <p className="text-gray-500 mb-6">Start scheduling meetings with your leads and clients</p>
                       <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
@@ -1218,7 +1218,7 @@ export default function AgentPortalPage() {
               <Card className="shadow-lg">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-blue-600" />
+                    <CalendarIcon className="h-5 w-5 text-blue-600" />
                     Calendar Management
                   </CardTitle>
                 </CardHeader>
@@ -1433,7 +1433,7 @@ function EmbeddedCalendar() {
     { value: 'property_showing', label: 'Property Showing', icon: Home, color: 'bg-blue-500' },
     { value: 'client_meeting', label: 'Client Meeting', icon: Users, color: 'bg-green-500' },
     { value: 'listing_appointment', label: 'Listing Appointment', icon: Building, color: 'bg-purple-500' },
-    { value: 'consultation', label: 'Consultation', icon: User, color: 'bg-orange-500' },
+    { value: 'consultation', label: 'Consultation', icon: UserIcon, color: 'bg-orange-500' },
     { value: 'virtual_tour', label: 'Virtual Tour', icon: Video, color: 'bg-pink-500' },
     { value: 'closing', label: 'Closing', icon: CheckCircle, color: 'bg-emerald-500' }
   ];
@@ -2082,7 +2082,7 @@ function EmbeddedInbox() {
             Valuations ({getRequestCount('valuation')})
           </TabsTrigger>
           <TabsTrigger value="booking" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
+            <CalendarIcon className="h-4 w-4" />
             Bookings ({getRequestCount('booking')})
           </TabsTrigger>
         </TabsList>
@@ -2114,7 +2114,7 @@ function EmbeddedInbox() {
                           <h4 className="font-medium text-lg">{request.title}</h4>
                           <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
                             <span className="flex items-center gap-1">
-                              <User className="h-3 w-3" />
+                              <UserIcon className="h-3 w-3" />
                               {request.name}
                             </span>
                             <span className="flex items-center gap-1">

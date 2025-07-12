@@ -48,19 +48,19 @@ export default function PropertyComparison() {
       key: "aiLifestyleScore", 
       label: "Lifestyle Match", 
       color: "text-primary",
-      format: (value: any) => `${value || 85}%`
+      format: (value: any) => value ? `${value}%` : "Contact agent for analysis"
     },
     { 
       key: "investmentScore", 
       label: "Investment Score", 
       color: "text-green-500",
-      format: (value: any) => `${value || 78}%`
+      format: (value: any) => value ? `${value}%` : "Schedule consultation"
     },
     { 
       key: "marketValueScore", 
       label: "Market Value", 
       color: "text-blue-500",
-      format: (value: any) => `${value || 92}%`
+      format: (value: any) => value ? `${value}%` : "Professional evaluation needed"
     },
   ];
 

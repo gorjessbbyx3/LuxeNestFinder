@@ -30,7 +30,7 @@ export default function VirtualTours() {
               Immersive 3D Virtual Tours
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Experience properties like never before with cutting-edge virtual reality tours, AR furniture placement, and AI-guided exploration.
+              Schedule a professional 3D walkthrough of any Hawaii luxury property. Contact our agents to arrange authentic virtual tours with real estate professionals.
             </p>
           </motion.div>
         </div>
@@ -62,9 +62,9 @@ export default function VirtualTours() {
             viewport={{ once: true }}
             className="text-center mb-12"
           >
-            <h2 className="text-3xl font-bold mb-6">Advanced Tour Features</h2>
+            <h2 className="text-3xl font-bold mb-6">Professional Property Services</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Our cutting-edge technology provides an unparalleled virtual property experience.
+              Our licensed real estate professionals provide comprehensive property viewing services for Hawaii luxury estates.
             </p>
           </motion.div>
           
@@ -78,9 +78,9 @@ export default function VirtualTours() {
               <Card className="text-center h-full">
                 <CardContent className="p-6">
                   <VR className="w-12 h-12 mx-auto mb-4 text-primary" />
-                  <h3 className="text-lg font-semibold mb-2">3D Walkthrough</h3>
+                  <h3 className="text-lg font-semibold mb-2">Scheduled Property Tours</h3>
                   <p className="text-muted-foreground text-sm">
-                    Navigate through properties in immersive 3D with full 360-degree views
+                    Book private showings with licensed agents for authentic property walkthroughs
                   </p>
                 </CardContent>
               </Card>
@@ -95,9 +95,9 @@ export default function VirtualTours() {
               <Card className="text-center h-full">
                 <CardContent className="p-6">
                   <Mic className="w-12 h-12 mx-auto mb-4 text-primary" />
-                  <h3 className="text-lg font-semibold mb-2">Voice Guided</h3>
+                  <h3 className="text-lg font-semibold mb-2">Expert Guidance</h3>
                   <p className="text-muted-foreground text-sm">
-                    AI-powered narration adapts to your interests and preferences
+                    Professional real estate consultations with market expertise and insights
                   </p>
                 </CardContent>
               </Card>
@@ -112,9 +112,9 @@ export default function VirtualTours() {
               <Card className="text-center h-full">
                 <CardContent className="p-6">
                   <Box className="w-12 h-12 mx-auto mb-4 text-primary" />
-                  <h3 className="text-lg font-semibold mb-2">AR Placement</h3>
+                  <h3 className="text-lg font-semibold mb-2">Property Planning</h3>
                   <p className="text-muted-foreground text-sm">
-                    Visualize furniture and renovations using augmented reality
+                    Consultation services for renovation planning and design possibilities
                   </p>
                 </CardContent>
               </Card>
@@ -129,9 +129,9 @@ export default function VirtualTours() {
               <Card className="text-center h-full">
                 <CardContent className="p-6">
                   <Camera className="w-12 h-12 mx-auto mb-4 text-primary" />
-                  <h3 className="text-lg font-semibold mb-2">4K Quality</h3>
+                  <h3 className="text-lg font-semibold mb-2">Professional Photography</h3>
                   <p className="text-muted-foreground text-sm">
-                    Ultra-high definition imagery with professional photography
+                    High-quality property photography and detailed visual documentation
                   </p>
                 </CardContent>
               </Card>
