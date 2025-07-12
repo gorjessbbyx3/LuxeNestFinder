@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
+import { useProperties } from "@/hooks/use-properties";
 import { 
   MapPin, 
   Plus, 
@@ -17,62 +18,7 @@ import {
   Navigation
 } from "lucide-react";
 
-// Actual Hawaiian luxury property locations with real coordinates
-const realHawaiiProperties = [
-  { 
-    id: 1, 
-    price: "$4.8M", 
-    title: "Wailea Oceanfront Estate",
-    beds: 5, 
-    baths: 4, 
-    sqft: "4,500",
-    lat: 20.6888, // Wailea, Maui - luxury oceanfront area
-    lng: -156.4419,
-    address: "3550 Wailea Alanui Dr, Wailea, HI 96753",
-    neighborhood: "Wailea",
-    island: "Maui",
-    image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-  },
-  { 
-    id: 2, 
-    price: "$6.2M", 
-    title: "Diamond Head Luxury Villa",
-    beds: 6, 
-    baths: 5, 
-    sqft: "5,200",
-    lat: 21.2619, // Diamond Head, Oahu
-    lng: -157.8063,
-    address: "240 Portlock Rd, Honolulu, HI 96825",
-    neighborhood: "Diamond Head",
-    island: "Oahu",
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-  },
-  { 
-    id: 3, 
-    price: "$8.1M", 
-    title: "Kona Coffee Estate",
-    beds: 7, 
-    baths: 6, 
-    sqft: "6,800",
-    lat: 19.6394, // Kona, Big Island
-    lng: -155.9969,
-    address: "75-5919 Alii Dr, Kailua-Kona, HI 96740",
-    neighborhood: "Kona",
-    island: "Big Island",
-    image: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-  },
-  { 
-    id: 4, 
-    price: "$5.9M", 
-    title: "Princeville Resort Villa",
-    beds: 5, 
-    baths: 4, 
-    sqft: "4,800",
-    lat: 22.2160, // Princeville, Kauai
-    lng: -159.4845,
-    address: "5300 Ka Haku Rd, Princeville, HI 96722",
-    neighborhood: "Princeville",
-    island: "Kauai",
+import { useProperties } from "@/hooks/use-properties";
     image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
   },
 ];

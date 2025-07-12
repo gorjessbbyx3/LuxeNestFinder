@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion } from "framer-motion";
+import { useProperties } from "@/hooks/use-properties";
 import { 
   MapPin, 
   Plus, 
@@ -29,48 +30,8 @@ export default function MapSearch() {
     { id: "volcano", label: "Volcano Views", icon: Home, color: "bg-red-500" },
   ];
 
-  const mockProperties = [
-    { 
-      id: 1, 
-      price: "$4.8M", 
-      title: "Oceanfront Villa Maui",
-      beds: 5, 
-      baths: 4, 
-      sqft: "4,500",
-      position: { top: "35%", left: "28%" }, // Maui position
-      image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-    },
-    { 
-      id: 2, 
-      price: "$3.2M", 
-      title: "Kailua Beach Estate",
-      beds: 4, 
-      baths: 3, 
-      sqft: "3,100",
-      position: { top: "42%", left: "45%" }, // Oahu/Kailua position
-      image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-    },
-    { 
-      id: 3, 
-      price: "$6.1M", 
-      title: "Big Island Volcano View",
-      beds: 6, 
-      baths: 5, 
-      sqft: "5,800",
-      position: { top: "65%", left: "58%" }, // Big Island position
-      image: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-    },
-    { 
-      id: 4, 
-      price: "$5.3M", 
-      title: "Kauai Garden Isle Retreat",
-      beds: 4, 
-      baths: 4, 
-      sqft: "4,200",
-      position: { top: "38%", left: "15%" }, // Kauai position
-      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-    },
-  ];
+  // Authentic Hawaii MLS properties fetched from database
+  const { data: properties } = useProperties({ featured: true, limit: 20 });
 
   const toggleOverlay = (overlayId: string) => {
     setActiveOverlays(prev => 
