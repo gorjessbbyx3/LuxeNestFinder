@@ -52,27 +52,14 @@ export class MLSScraperService {
       // Get latest MLS listings
       const mlsListings = await hiCentralMLSService.getLuxuryListings(0);
       
-      // Convert MLS listings to our property format (skip duplicates)
-      let newCount = 0;
+      // Convert MLS listings to our property format
       for (const mlsListing of mlsListings) {
-        try {
-          // Check if property already exists
-          const existingProperty = await this.checkIfPropertyExists(mlsListing.mlsNumber);
-          if (existingProperty) {
-            console.log(`⏭️ Skipping existing property MLS#${mlsListing.mlsNumber}`);
-            continue;
-          }
-          
-          const scrapedProperty = await this.convertMLSToProperty(mlsListing);
-          await this.savePropertyToDatabase(scrapedProperty);
-          newCount++;
-        } catch (error) {
-          console.error(`❌ Error processing MLS#${mlsListing.mlsNumber}:`, error);
-        }
+        const scrapedProperty = await this.convertMLSToProperty(mlsListing);
+        await this.savePropertyToDatabase(scrapedProperty);
       }
       
       this.lastScrapeTime = new Date();
-      console.log(`✅ Successfully scraped ${newCount} new MLS listings`);
+      console.log(`✅ Successfully scraped ${mlsListings.length} MLS listings`);
       
     } catch (error) {
       console.error('❌ Error scraping MLS listings:', error);
@@ -193,33 +180,12 @@ export class MLSScraperService {
   }
 
   /**
-   * Check if property already exists by MLS number
-   */
-  private async checkIfPropertyExists(mlsNumber: string): Promise<boolean> {
-    try {
-      const existingProperties = await storage.getProperties({ limit: 1000 });
-      return existingProperties.some(p => 
-        p.mlsNumber === mlsNumber || 
-        p.title.includes(mlsNumber) || 
-        p.description.includes(mlsNumber)
-      );
-    } catch (error) {
-      console.error('Error checking property existence:', error);
-      return false;
-    }
-  }
-
-  /**
    * Save scraped property to database
    */
   private async savePropertyToDatabase(scrapedProperty: ScrapedListing): Promise<void> {
     try {
-      // Check if property already exists by MLS number
-      const existingProperties = await storage.getProperties();
-      const existingProperty = existingProperties.find(p => 
-        p.title.includes(scrapedProperty.mlsNumber) || 
-        p.description.includes(scrapedProperty.mlsNumber)
-      );
+      // Check if property already exists by MLS number using proper database query
+      const existingProperty = await storage.getPropertyByMLSNumber(scrapedProperty.mlsNumber);
 
       if (existingProperty) {
         console.log(`🔄 Updating existing property MLS#${scrapedProperty.mlsNumber}`);

@@ -19,7 +19,7 @@ import { mlsScraperService } from "./lib/mls-scraper";
 import { marketValuePredictor } from "./lib/market-value-predictor";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
+
   // Properties endpoints
   app.get("/api/properties", async (req, res) => {
     try {
@@ -54,18 +54,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/properties/:id", async (req, res) => {
     try {
-      const id = parseInt(req.params.id);
-      if (isNaN(id)) {
-        return res.status(400).json({ message: "Invalid property ID format" });
+      const propertyId = parseInt(req.params.id);
+
+      if (isNaN(propertyId)) {
+        return res.status(400].json({ message: "Invalid property ID" });
       }
-      const property = await storage.getProperty(id);
+
+      const property = await storage.getProperty(propertyId);
       if (!property) {
-        return res.status(404).json({ message: "Property not found" });
+        return res.status(404].json({ message: "Property not found" });
       }
       res.json(property);
     } catch (error) {
       console.error("Error fetching property:", error);
-      res.status(500).json({ message: "Failed to fetch property" });
+      res.status(500].json({ message: "Failed to fetch property" });
     }
   });
 
@@ -145,13 +147,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/chat", async (req, res) => {
     try {
       const { message, leadId, conversationId } = req.body;
-      
+
       if (!message) {
         return res.status(400).json({ message: "Message is required" });
       }
 
       let conversation;
-      
+
       if (conversationId) {
         conversation = await storage.getChatConversation(conversationId);
         if (!conversation) {
@@ -178,7 +180,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       // Generate AI response (simplified - in production, integrate with OpenAI)
       const aiResponse = await generateAIResponse(message, conversation);
-      
+
       updatedMessages.push({
         role: 'assistant' as const,
         content: aiResponse,
@@ -201,7 +203,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/ai/generate-description", async (req, res) => {
     try {
       const { propertyData } = req.body;
-      
+
       if (!propertyData) {
         return res.status(400).json({ message: "Property data is required" });
       }
@@ -218,14 +220,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/ai/lifestyle-match", async (req, res) => {
     try {
       const { preferences } = req.body;
-      
+
       if (!preferences) {
         return res.status(400).json({ message: "Preferences are required" });
       }
 
       // Get properties and calculate lifestyle scores
       const properties = await storage.getProperties({ limit: 50 });
-      
+
       const scoredProperties = properties.map(property => ({
         ...property,
         lifestyleMatch: calculateLifestyleMatch(property, preferences)
@@ -460,13 +462,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const agentId = parseInt(req.params.agentId);
       const { dateFrom, dateTo } = req.query;
-      
+
       const performance = await storage.getAgentPerformance(
         agentId,
         dateFrom ? new Date(dateFrom as string) : undefined,
         dateTo ? new Date(dateTo as string) : undefined
       );
-      
+
       res.json(performance);
     } catch (error) {
       console.error("Error fetching agent performance:", error);
@@ -481,7 +483,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!q) {
         return res.status(400).json({ message: "Search query is required" });
       }
-      
+
       const leads = await storage.searchLeads(q as string);
       res.json(leads);
     } catch (error) {
@@ -505,11 +507,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/hawaii-parcels/by-bounds", async (req, res) => {
     try {
       const { minLat, maxLat, minLng, maxLng, county } = req.query;
-      
+
       if (!minLat || !maxLat || !minLng || !maxLng) {
         return res.status(400).json({ error: "Missing required boundary parameters" });
       }
-      
+
       const parcels = await hawaiiParcelService.getParcelsByBounds(
         Number(minLat),
         Number(maxLat), 
@@ -517,7 +519,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         Number(maxLng),
         county ? String(county) : undefined
       );
-      
+
       res.json(parcels);
     } catch (error) {
       console.error("Error fetching parcels by bounds:", error);
@@ -529,11 +531,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { tmk } = req.params;
       const parcel = await hawaiiParcelService.getParcelByTMK(tmk);
-      
+
       if (!parcel) {
         return res.status(404).json({ error: "Parcel not found" });
       }
-      
+
       res.json(parcel);
     } catch (error) {
       console.error("Error fetching parcel by TMK:", error);
@@ -544,17 +546,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/hawaii-parcels/enrich-property", async (req, res) => {
     try {
       const { lat, lng, radius = 0.001 } = req.body;
-      
+
       if (!lat || !lng) {
         return res.status(400).json({ error: "Missing latitude or longitude" });
       }
-      
+
       const enrichmentData = await hawaiiParcelService.enrichPropertyWithParcelData(
         Number(lat),
         Number(lng),
         Number(radius)
       );
-      
+
       res.json(enrichmentData);
     } catch (error) {
       console.error("Error enriching property with parcel data:", error);
@@ -603,11 +605,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { mlsNumber } = req.params;
       const listing = await hiCentralMLSService.getPropertyByMLS(mlsNumber);
-      
+
       if (!listing) {
         return res.status(404).json({ error: "MLS listing not found" });
       }
-      
+
       res.json(listing);
     } catch (error) {
       console.error("Error fetching MLS property:", error);
@@ -618,17 +620,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/mls/nearby", async (req, res) => {
     try {
       const { lat, lng, radius = 5 } = req.query;
-      
+
       if (!lat || !lng) {
         return res.status(400).json({ error: "Missing latitude or longitude" });
       }
-      
+
       const listings = await hiCentralMLSService.getPropertiesInRadius(
         Number(lat),
         Number(lng),
         Number(radius)
       );
-      
+
       res.json(listings);
     } catch (error) {
       console.error("Error fetching nearby MLS properties:", error);
@@ -661,11 +663,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { mlsNumber } = req.params;
       const listing = await hiCentralMLSService.getPropertyByMLS(mlsNumber);
-      
+
       if (!listing) {
         return res.status(404).json({ error: "MLS listing not found" });
       }
-      
+
       res.json({
         mlsNumber: listing.mlsNumber,
         address: listing.address,
@@ -821,7 +823,7 @@ async function generateAIResponse(message: string, conversation: any): Promise<s
     "I can schedule a virtual tour or in-person viewing for you. What would you prefer?",
     "The estimated ROI for that property is quite attractive. Would you like a detailed financial analysis?",
   ];
-  
+
   return responses[Math.floor(Math.random() * responses.length)];
 }
 
@@ -863,8 +865,7 @@ function calculateLifestyleMatch(property: any, preferences: any): number | null
   if (preferences.lifestyle?.oceanActivities && property.amenities?.includes('Beach Access')) {
     score += 20;
     factors++;
-  }
-  if (preferences.lifestyle?.privacy && property.propertyType === 'estate') {
+  }  if (preferences.lifestyle?.privacy && property.propertyType === 'estate') {
     score += 15;
     factors++;
   }

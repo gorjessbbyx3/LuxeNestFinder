@@ -52,6 +52,7 @@ export interface IStorage {
     offset?: number;
   }): Promise<Property[]>;
   getProperty(id: number): Promise<Property | undefined>;
+  getPropertyByMLSNumber(mlsNumber: string): Promise<Property | undefined>;
   createProperty(property: InsertProperty): Promise<Property>;
   updateProperty(id: number, property: Partial<InsertProperty>): Promise<Property>;
   
@@ -207,6 +208,11 @@ export class DatabaseStorage implements IStorage {
 
   async getProperty(id: number): Promise<Property | undefined> {
     const [property] = await db.select().from(properties).where(eq(properties.id, id));
+    return property;
+  }
+
+  async getPropertyByMLSNumber(mlsNumber: string): Promise<Property | undefined> {
+    const [property] = await db.select().from(properties).where(eq(properties.mlsNumber, mlsNumber));
     return property;
   }
 
