@@ -56,7 +56,7 @@ export default function CalendarPage() {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('month');
+  const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('week');
   const [filterType, setFilterType] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
@@ -289,6 +289,32 @@ export default function CalendarPage() {
                   </div>
                   
                   <div className="flex items-center gap-3">
+                    <div className="flex bg-gray-100 rounded-lg p-1">
+                      <Button
+                        size="sm"
+                        variant={viewMode === 'month' ? 'default' : 'ghost'}
+                        onClick={() => setViewMode('month')}
+                        className="text-xs"
+                      >
+                        Month
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={viewMode === 'week' ? 'default' : 'ghost'}
+                        onClick={() => setViewMode('week')}
+                        className="text-xs"
+                      >
+                        Week
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant={viewMode === 'day' ? 'default' : 'ghost'}
+                        onClick={() => setViewMode('day')}
+                        className="text-xs"
+                      >
+                        Day
+                      </Button>
+                    </div>
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <Input
@@ -319,68 +345,86 @@ export default function CalendarPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Calendar Grid */}
-                <div className="grid grid-cols-7 gap-1 mb-4">
-                  {DAYS.map(day => (
-                    <div key={day} className="text-center font-semibold text-gray-600 py-2">
-                      {day}
+                {viewMode === 'month' && (
+                  <>
+                    {/* Calendar Grid */}
+                    <div className="grid grid-cols-7 gap-1 mb-4">
+                      {DAYS.map(day => (
+                        <div key={day} className="text-center font-semibold text-gray-600 py-2">
+                          {day}
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-                
-                <div className="grid grid-cols-7 gap-1">
-                  {calendarData.days.map((day, index) => {
-                    const dayAppointments = getAppointmentsForDate(day);
-                    const isSelected = day.toDateString() === selectedDate.toDateString();
-                    const isTodayDate = isToday(day);
-                    const isCurrentMonthDay = isCurrentMonth(day);
                     
-                    return (
-                      <motion.div
-                        key={index}
-                        whileHover={{ scale: 1.02 }}
-                        className={`
-                          min-h-[100px] p-2 border cursor-pointer transition-all
-                          ${isSelected ? 'bg-blue-100 border-blue-500' : 'hover:bg-gray-50'}
-                          ${isTodayDate ? 'bg-blue-50 border-blue-300' : ''}
-                          ${!isCurrentMonthDay ? 'text-gray-400 bg-gray-50' : ''}
-                        `}
-                        onClick={() => setSelectedDate(day)}
-                      >
-                        <div className={`
-                          text-sm font-medium mb-1
-                          ${isTodayDate ? 'text-blue-600' : ''}
-                          ${isSelected ? 'text-blue-600 font-bold' : ''}
-                        `}>
-                          {day.getDate()}
-                        </div>
+                    <div className="grid grid-cols-7 gap-1">
+                      {calendarData.days.map((day, index) => {
+                        const dayAppointments = getAppointmentsForDate(day);
+                        const isSelected = day.toDateString() === selectedDate.toDateString();
+                        const isTodayDate = isToday(day);
+                        const isCurrentMonthDay = isCurrentMonth(day);
                         
-                        <div className="space-y-1">
-                          {dayAppointments.slice(0, 3).map((appointment, idx) => {
-                            const typeConfig = getAppointmentTypeConfig(appointment.type);
-                            return (
-                              <div
-                                key={idx}
-                                className={`
-                                  text-xs p-1 rounded text-white truncate
-                                  ${typeConfig.color}
-                                `}
-                                title={`${appointment.title} - ${formatTime(appointment.scheduledAt)}`}
-                              >
-                                {formatTime(appointment.scheduledAt)} {appointment.title}
-                              </div>
-                            );
-                          })}
-                          {dayAppointments.length > 3 && (
-                            <div className="text-xs text-gray-500 font-medium">
-                              +{dayAppointments.length - 3} more
+                        return (
+                          <motion.div
+                            key={index}
+                            whileHover={{ scale: 1.02 }}
+                            className={`
+                              min-h-[100px] p-2 border cursor-pointer transition-all
+                              ${isSelected ? 'bg-blue-100 border-blue-500' : 'hover:bg-gray-50'}
+                              ${isTodayDate ? 'bg-blue-50 border-blue-300' : ''}
+                              ${!isCurrentMonthDay ? 'text-gray-400 bg-gray-50' : ''}
+                            `}
+                            onClick={() => setSelectedDate(day)}
+                          >
+                            <div className={`
+                              text-sm font-medium mb-1
+                              ${isTodayDate ? 'text-blue-600' : ''}
+                              ${isSelected ? 'text-blue-600 font-bold' : ''}
+                            `}>
+                              {day.getDate()}
                             </div>
-                          )}
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+                            
+                            <div className="space-y-1">
+                              {dayAppointments.slice(0, 3).map((appointment, idx) => {
+                                const typeConfig = getAppointmentTypeConfig(appointment.type);
+                                return (
+                                  <div
+                                    key={idx}
+                                    className={`
+                                      text-xs p-1 rounded text-white truncate
+                                      ${typeConfig.color}
+                                    `}
+                                    title={`${appointment.title} - ${formatTime(appointment.scheduledAt)}`}
+                                  >
+                                    {formatTime(appointment.scheduledAt)} {appointment.title}
+                                  </div>
+                                );
+                              })}
+                              {dayAppointments.length > 3 && (
+                                <div className="text-xs text-gray-500 font-medium">
+                                  +{dayAppointments.length - 3} more
+                                </div>
+                              )}
+                            </div>
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+                  </>
+                )}
+
+                {viewMode === 'week' && <WeekView 
+                  currentDate={currentDate} 
+                  appointments={filteredAppointments} 
+                  onDateSelect={setSelectedDate}
+                  selectedDate={selectedDate}
+                />}
+
+                {viewMode === 'day' && <DayView 
+                  selectedDate={selectedDate} 
+                  appointments={filteredAppointments.filter(a => 
+                    new Date(a.scheduledAt).toDateString() === selectedDate.toDateString()
+                  )}
+                />}
               </CardContent>
             </Card>
           </div>
@@ -545,6 +589,164 @@ export default function CalendarPage() {
       </div>
 
       <Footer />
+    </div>
+  );
+}
+
+// Week View Component
+function WeekView({ currentDate, appointments, onDateSelect, selectedDate }: {
+  currentDate: Date;
+  appointments: any[];
+  onDateSelect: (date: Date) => void;
+  selectedDate: Date;
+}) {
+  const weekDays = useMemo(() => {
+    const start = new Date(currentDate);
+    start.setDate(start.getDate() - start.getDay()); // Start from Sunday
+    
+    const days = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(start);
+      day.setDate(start.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  }, [currentDate]);
+
+  const timeSlots = Array.from({ length: 24 }, (_, i) => i);
+
+  const getAppointmentsForTimeSlot = (date: Date, hour: number) => {
+    return appointments.filter(appointment => {
+      const appointmentDate = new Date(appointment.scheduledAt);
+      return appointmentDate.toDateString() === date.toDateString() &&
+             appointmentDate.getHours() === hour;
+    });
+  };
+
+  return (
+    <div className="overflow-auto max-h-[600px]">
+      {/* Week Header */}
+      <div className="grid grid-cols-8 gap-1 sticky top-0 bg-white z-10 border-b">
+        <div className="p-2 text-xs font-medium text-gray-500">Time</div>
+        {weekDays.map((day, index) => (
+          <div
+            key={index}
+            className={`p-2 text-center cursor-pointer transition-colors ${
+              day.toDateString() === selectedDate.toDateString() 
+                ? 'bg-blue-100 text-blue-600 font-bold' 
+                : 'hover:bg-gray-50'
+            }`}
+            onClick={() => onDateSelect(day)}
+          >
+            <div className="text-xs font-medium">{DAYS[day.getDay()]}</div>
+            <div className={`text-lg ${day.toDateString() === new Date().toDateString() ? 'text-blue-600 font-bold' : ''}`}>
+              {day.getDate()}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Time Grid */}
+      <div className="relative">
+        {timeSlots.map(hour => (
+          <div key={hour} className="grid grid-cols-8 gap-1 border-b border-gray-100">
+            <div className="p-2 text-xs text-gray-500 border-r">
+              {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
+            </div>
+            {weekDays.map((day, dayIndex) => {
+              const slotAppointments = getAppointmentsForTimeSlot(day, hour);
+              return (
+                <div key={dayIndex} className="p-1 min-h-[60px] border-r border-gray-50 hover:bg-gray-25 cursor-pointer">
+                  {slotAppointments.map((appointment, idx) => {
+                    const typeConfig = getAppointmentTypeConfig(appointment.type);
+                    const Icon = typeConfig.icon;
+                    return (
+                      <div
+                        key={idx}
+                        className={`${typeConfig.color} text-white text-xs p-1 rounded mb-1 truncate`}
+                        title={appointment.title}
+                      >
+                        <div className="flex items-center gap-1">
+                          <Icon className="h-3 w-3" />
+                          <span className="truncate">{appointment.title}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Day View Component
+function DayView({ selectedDate, appointments }: {
+  selectedDate: Date;
+  appointments: any[];
+}) {
+  const timeSlots = Array.from({ length: 24 }, (_, i) => i);
+
+  const getAppointmentsForHour = (hour: number) => {
+    return appointments.filter(appointment => {
+      const appointmentDate = new Date(appointment.scheduledAt);
+      return appointmentDate.getHours() === hour;
+    });
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="text-center pb-4 border-b">
+        <h3 className="text-lg font-semibold">
+          {selectedDate.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+          })}
+        </h3>
+      </div>
+
+      <div className="space-y-1 max-h-[500px] overflow-auto">
+        {timeSlots.map(hour => {
+          const hourAppointments = getAppointmentsForHour(hour);
+          return (
+            <div key={hour} className="flex border-b border-gray-100">
+              <div className="w-20 p-2 text-xs text-gray-500 border-r">
+                {hour === 0 ? '12 AM' : hour < 12 ? `${hour} AM` : hour === 12 ? '12 PM' : `${hour - 12} PM`}
+              </div>
+              <div className="flex-1 p-2 min-h-[60px]">
+                {hourAppointments.map((appointment, idx) => {
+                  const typeConfig = getAppointmentTypeConfig(appointment.type);
+                  const Icon = typeConfig.icon;
+                  return (
+                    <div
+                      key={idx}
+                      className={`${typeConfig.color} text-white p-3 rounded-lg mb-2`}
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <Icon className="h-4 w-4" />
+                        <span className="font-medium">{appointment.title}</span>
+                      </div>
+                      <div className="text-xs opacity-90">
+                        {formatTime(appointment.scheduledAt)} • {typeConfig.label}
+                      </div>
+                      {appointment.location && (
+                        <div className="text-xs opacity-75 mt-1">
+                          📍 {appointment.location}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

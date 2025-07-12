@@ -16,6 +16,7 @@ export default function Navigation() {
     { name: "Virtual Tours", href: "/virtual-tours" },
     { name: "Neighborhoods", href: "/neighborhoods" },
     { name: "Calendar", href: "/calendar" },
+    { name: "Inbox", href: "/inbox" },
     { name: "Sell Your Home", href: "/sell-your-home" },
   ];
 
