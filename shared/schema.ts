@@ -33,6 +33,10 @@ export const properties = pgTable("properties", {
   aiLifestyleScore: integer("ai_lifestyle_score"), // 1-100 AI compatibility score
   investmentScore: integer("investment_score"), // 1-100 investment potential
   marketValueScore: integer("market_value_score"), // 1-100 market value score
+  mlsNumber: text("mls_number").unique(), // Hawaii MLS listing number
+  listingAgent: text("listing_agent"),
+  sqft: integer("sqft"), // Alternative field name for compatibility
+  coordinates: text("coordinates"), // "lat,lng" format
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

@@ -14,6 +14,7 @@ import {
 import { generatePropertyDescription } from "./lib/openai";
 import { hawaiiParcelService } from "./lib/hawaii-parcels";
 import { hiCentralMLSService } from "./lib/hicentral-mls";
+import { mlsScraperService } from "./lib/mls-scraper";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -672,6 +673,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "Failed to fetch MLS photos" });
     }
   });
+
+  // MLS Scraper Management Endpoints
+  app.post("/api/scraper/sync", async (req, res) => {
+    try {
+      console.log('🔄 Manual MLS sync triggered...');
+      await mlsScraperService.scrapeNewListings();
+      res.json({ 
+        success: true, 
+        message: "MLS sync completed successfully" 
+      });
+    } catch (error) {
+      console.error("Error during manual MLS sync:", error);
+      res.status(500).json({ error: "Failed to sync MLS data" });
+    }
+  });
+
+  app.get("/api/scraper/status", async (req, res) => {
+    try {
+      const status = mlsScraperService.getScraperStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Error fetching scraper status:", error);
+      res.status(500).json({ error: "Failed to fetch scraper status" });
+    }
+  });
+
+  // Start automatic MLS scraping on server startup
+  mlsScraperService.startAutoScraping();
 
   const httpServer = createServer(app);
   return httpServer;
