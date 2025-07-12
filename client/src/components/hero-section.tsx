@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { FileBox as VR, Brain, Play } from "lucide-react";
+import honoluluVideo from "@assets/Honolulu_Video_Link_Provided_1752352276060.mp4";
+import aerialImage from "@assets/aerial-view2-768x537_1752329318459.jpg";
 
 export default function HeroSection() {
   return (
@@ -13,14 +15,10 @@ export default function HeroSection() {
           loop
           playsInline
           className="w-full h-full object-cover"
+          poster={aerialImage}
         >
-          <source src="@assets/Honolulu_Video_Link_Provided_1752352276060.mp4" type="video/mp4" />
-          {/* Fallback image for browsers that don't support video */}
-          <img 
-            src="@assets/aerial-view2-768x537_1752329318459.jpg"
-            alt="Stunning aerial view of Honolulu and Diamond Head crater with luxury oceanfront properties"
-            className="w-full h-full object-cover"
-          />
+          <source src={honoluluVideo} type="video/mp4" />
+          Your browser does not support the video tag.
         </video>
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-background/20" />
       </div>
