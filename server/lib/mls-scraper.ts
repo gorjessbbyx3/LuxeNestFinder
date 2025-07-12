@@ -52,14 +52,27 @@ export class MLSScraperService {
       // Get latest MLS listings
       const mlsListings = await hiCentralMLSService.getLuxuryListings(0);
       
-      // Convert MLS listings to our property format
+      // Convert MLS listings to our property format (skip duplicates)
+      let newCount = 0;
       for (const mlsListing of mlsListings) {
-        const scrapedProperty = await this.convertMLSToProperty(mlsListing);
-        await this.savePropertyToDatabase(scrapedProperty);
+        try {
+          // Check if property already exists
+          const existingProperty = await this.checkIfPropertyExists(mlsListing.mlsNumber);
+          if (existingProperty) {
+            console.log(`⏭️ Skipping existing property MLS#${mlsListing.mlsNumber}`);
+            continue;
+          }
+          
+          const scrapedProperty = await this.convertMLSToProperty(mlsListing);
+          await this.savePropertyToDatabase(scrapedProperty);
+          newCount++;
+        } catch (error) {
+          console.error(`❌ Error processing MLS#${mlsListing.mlsNumber}:`, error);
+        }
       }
       
       this.lastScrapeTime = new Date();
-      console.log(`✅ Successfully scraped ${mlsListings.length} MLS listings`);
+      console.log(`✅ Successfully scraped ${newCount} new MLS listings`);
       
     } catch (error) {
       console.error('❌ Error scraping MLS listings:', error);
@@ -176,6 +189,23 @@ export class MLSScraperService {
       case 'Multi-Family': return 'multi-family';
       case 'Land': return 'land';
       default: return 'house';
+    }
+  }
+
+  /**
+   * Check if property already exists by MLS number
+   */
+  private async checkIfPropertyExists(mlsNumber: string): Promise<boolean> {
+    try {
+      const existingProperties = await storage.getProperties({ limit: 1000 });
+      return existingProperties.some(p => 
+        p.mlsNumber === mlsNumber || 
+        p.title.includes(mlsNumber) || 
+        p.description.includes(mlsNumber)
+      );
+    } catch (error) {
+      console.error('Error checking property existence:', error);
+      return false;
     }
   }
 

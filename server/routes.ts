@@ -54,7 +54,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/properties/:id", async (req, res) => {
     try {
-      const property = await storage.getProperty(Number(req.params.id));
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        return res.status(400).json({ message: "Invalid property ID format" });
+      }
+      const property = await storage.getProperty(id);
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
       }

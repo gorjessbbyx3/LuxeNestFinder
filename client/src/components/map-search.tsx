@@ -20,7 +20,10 @@ import {
 } from "lucide-react";
 
 export default function MapSearch() {
-  const [selectedProperty, setSelectedProperty] = useState<number | null>(1);
+  // Fetch authentic Hawaii MLS properties from database
+  const { data: properties } = useProperties({ featured: true, limit: 20 });
+  
+  const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
   const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
 
   const overlayTypes = [
@@ -121,15 +124,15 @@ export default function MapSearch() {
             className="w-full h-full object-cover"
           />
           
-          {/* Property Markers */}
-          {mockProperties.map((property) => (
+          {/* Authentic Property Markers */}
+          {properties?.map((property) => (
             <motion.div
               key={property.id}
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ duration: 0.3, delay: property.id * 0.1 }}
               className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-              style={property.position}
+              style={{ top: '50%', left: '50%' }}
               onClick={() => setSelectedProperty(property.id)}
             >
               <div 
@@ -139,13 +142,13 @@ export default function MapSearch() {
                     : "bg-primary/80 text-primary-foreground hover:bg-primary"
                 }`}
               >
-                {property.id}
+                ${Math.round(property.price / 1000000)}M
               </div>
             </motion.div>
           ))}
 
           {/* Property Info Popup */}
-          {selectedPropertyData && (
+          {selectedProperty && properties?.find(p => p.id === selectedProperty) && (
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -155,7 +158,7 @@ export default function MapSearch() {
               <Card className="map-overlay">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">{selectedPropertyData.title}</h4>
+                    <h4 className="font-semibold">{properties?.find(p => p.id === selectedProperty)?.title}</h4>
                     <Button
                       size="icon"
                       variant="ghost"
@@ -216,7 +219,7 @@ export default function MapSearch() {
         <div className="p-6 bg-muted">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Found <span className="font-semibold text-primary">{mockProperties.length} luxury properties</span> across Hawaiian islands
+              Found <span className="font-semibold text-primary">{properties?.length || 0} luxury properties</span> across Hawaiian islands
             </div>
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm">

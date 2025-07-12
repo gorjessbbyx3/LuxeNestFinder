@@ -38,27 +38,12 @@ export default function PropertySearch() {
     >
       <Card className="glass-morphism max-w-4xl mx-auto">
         <CardContent className="p-8">
-          {/* Search Mode Toggle */}
+          {/* Professional Search Notice */}
           <div className="flex justify-center mb-6">
-            <div className="bg-muted rounded-lg p-1 flex">
-              <Button
-                variant={!isAIMode ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setIsAIMode(false)}
-                className="rounded-md"
-              >
-                <Search className="w-4 h-4 mr-2" />
-                Standard Search
-              </Button>
-              <Button
-                variant={isAIMode ? "default" : "ghost"}
-                size="sm"
-                onClick={() => setIsAIMode(true)}
-                className="rounded-md ai-glow"
-              >
-                <Brain className="w-4 h-4 mr-2" />
-                AI Search
-              </Button>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+              <Brain className="w-8 h-8 mx-auto text-blue-600 mb-2" />
+              <h3 className="font-semibold text-blue-800">AI-Powered Search Available</h3>
+              <p className="text-sm text-blue-600">Contact our agents for personalized AI property matching</p>
             </div>
           </div>
 

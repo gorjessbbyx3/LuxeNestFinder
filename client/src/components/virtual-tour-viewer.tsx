@@ -63,17 +63,17 @@ export default function VirtualTourViewer({ propertyId }: VirtualTourViewerProps
                 transition={{ duration: 0.3 }}
                 className="text-center"
               >
+                <div className="mb-6">
+                  <Camera className="w-16 h-16 mx-auto text-gray-400 mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Professional Virtual Tour</h3>
+                  <p className="text-muted-foreground">Contact our team to schedule a personalized virtual tour</p>
+                </div>
                 <Button
                   size="lg"
-                  onClick={handlePlayTour}
-                  className="w-20 h-20 rounded-full text-2xl ai-glow"
+                  className="bg-gradient-to-r from-blue-600 to-purple-600"
                 >
-                  <Play className="w-8 h-8" />
+                  Schedule Virtual Tour
                 </Button>
-                <div className="mt-4">
-                  <h3 className="text-xl font-semibold mb-2">3D Virtual Tour</h3>
-                  <p className="text-muted-foreground">Click to explore this property</p>
-                </div>
               </motion.div>
             ) : (
               /* Simulated 3D Tour Interface */

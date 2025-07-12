@@ -19,9 +19,7 @@ import {
 } from "lucide-react";
 
 import { useProperties } from "@/hooks/use-properties";
-    image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
-  },
-];
+
 
 const hawaiiOverlays = [
   { id: "beaches", label: "Beaches", icon: Sun, color: "bg-blue-400" },
@@ -85,13 +83,17 @@ export default function RealLocationMap() {
 
           googleMapRef.current = map;
 
-          // Add property markers with real coordinates
-          realHawaiiProperties.forEach((property) => {
-            const marker = new window.google.maps.Marker({
-              position: { lat: property.lat, lng: property.lng },
-              map: map,
-              title: `${property.title} - ${property.price}`,
-              icon: {
+          // Add property markers with authentic database properties
+          if (properties) {
+            properties.forEach((property) => {
+              const coordinates = property.coordinates ? 
+                property.coordinates.split(',').map(Number) : 
+                [21.0943, -157.4983]; // Default Hawaii center
+              const marker = new window.google.maps.Marker({
+                position: { lat: coordinates[0], lng: coordinates[1] },
+                map: map,
+                title: `${property.title} - $${property.price.toLocaleString()}`,
+                icon: {
                 path: window.google.maps.SymbolPath.CIRCLE,
                 scale: selectedProperty === property.id ? 15 : 12,
                 fillColor: selectedProperty === property.id ? '#3b82f6' : '#1e40af',
