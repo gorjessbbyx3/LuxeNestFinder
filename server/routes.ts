@@ -57,17 +57,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const propertyId = parseInt(req.params.id);
 
       if (isNaN(propertyId)) {
-        return res.status(400].json({ message: "Invalid property ID" });
+        return res.status(400).json({ message: "Invalid property ID" });
       }
 
       const property = await storage.getProperty(propertyId);
       if (!property) {
-        return res.status(404].json({ message: "Property not found" });
+        return res.status(404).json({ message: "Property not found" });
       }
       res.json(property);
     } catch (error) {
       console.error("Error fetching property:", error);
-      res.status(500].json({ message: "Failed to fetch property" });
+      res.status(500).json({ message: "Failed to fetch property" });
     }
   });
 
