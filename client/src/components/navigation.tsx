@@ -15,6 +15,7 @@ export default function Navigation() {
     { name: "Properties", href: "/properties" },
     { name: "Virtual Tours", href: "/virtual-tours" },
     { name: "Neighborhoods", href: "/neighborhoods" },
+    { name: "Sell Your Home", href: "/sell-your-home" },
   ];
 
   const isActive = (href: string) => location === href;

@@ -7,6 +7,7 @@ import VirtualTourViewer from "@/components/virtual-tour-viewer";
 import AIChat from "@/components/ai-chat";
 import PropertyComparison from "@/components/property-comparison";
 import FloatingActions from "@/components/floating-actions";
+import Footer from "@/components/footer";
 import { useProperties } from "@/hooks/use-properties";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -249,54 +250,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-card py-16 px-4 border-t">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-4 gap-8">
-            <div className="lg:col-span-2">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-12 h-12 bg-primary rounded-xl flex items-center justify-center">
-                  <span className="text-primary-foreground font-bold text-xl">P</span>
-                </div>
-                <span className="font-serif font-bold text-3xl">Prestige Hawaii</span>
-              </div>
-              <p className="text-muted-foreground mb-6 max-w-md">
-                Discover luxury Hawaiian properties with cutting-edge AI technology, immersive 3D tours, 
-                and personalized matching that goes beyond traditional real estate.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-lg mb-4">Explore</h4>
-              <ul className="space-y-2">
-                <li><a href="/properties" className="text-muted-foreground hover:text-primary transition-colors">Featured Properties</a></li>
-                <li><a href="/virtual-tours" className="text-muted-foreground hover:text-primary transition-colors">3D Virtual Tours</a></li>
-                <li><a href="/neighborhoods" className="text-muted-foreground hover:text-primary transition-colors">Neighborhoods</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-semibold text-lg mb-4">Contact</h4>
-              <ul className="space-y-3">
-                <li className="flex items-center gap-2">
-                  <span className="text-muted-foreground">(808) 555-LUXURY</span>
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="text-muted-foreground">hello@prestigehawaii.com</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-muted-foreground">1000 Ala Moana Blvd<br />Honolulu, HI 96814</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t mt-12 pt-8 text-center text-muted-foreground">
-            <p>© 2024 Prestige Hawaii Realty. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-
+      <Footer />
       <FloatingActions />
     </div>
   );
