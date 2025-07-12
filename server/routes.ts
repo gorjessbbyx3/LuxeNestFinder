@@ -1,7 +1,16 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertLeadSchema, insertPropertyInquirySchema, insertChatConversationSchema } from "@shared/schema";
+import { 
+  insertLeadSchema, 
+  insertPropertyInquirySchema, 
+  insertChatConversationSchema,
+  insertAgentSchema,
+  insertAppointmentSchema,
+  insertContractSchema,
+  insertCommissionSchema,
+  insertMarketingCampaignSchema
+} from "@shared/schema";
 import { generatePropertyDescription } from "./lib/openai";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -217,6 +226,258 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error in lifestyle matching:", error);
       res.status(500).json({ message: "Lifestyle matching service unavailable" });
+    }
+  });
+
+  // 🚀 REVOLUTIONARY CRM ENDPOINTS - Enterprise capabilities beyond OpenAI's basic suggestions!
+
+  // AGENTS - Multi-agent team management
+  app.get("/api/agents", async (req, res) => {
+    try {
+      const { role, teamId, isActive } = req.query;
+      const agents = await storage.getAgents({
+        role: role as string,
+        teamId: teamId ? parseInt(teamId as string) : undefined,
+        isActive: isActive !== undefined ? isActive === 'true' : undefined
+      });
+      res.json(agents);
+    } catch (error) {
+      console.error("Error fetching agents:", error);
+      res.status(500).json({ message: "Failed to fetch agents" });
+    }
+  });
+
+  app.post("/api/agents", async (req, res) => {
+    try {
+      const agent = insertAgentSchema.parse(req.body);
+      const newAgent = await storage.createAgent(agent);
+      res.json(newAgent);
+    } catch (error) {
+      console.error("Error creating agent:", error);
+      res.status(400).json({ message: "Invalid agent data" });
+    }
+  });
+
+  app.get("/api/agents/:id", async (req, res) => {
+    try {
+      const agent = await storage.getAgent(parseInt(req.params.id));
+      if (!agent) {
+        return res.status(404).json({ message: "Agent not found" });
+      }
+      res.json(agent);
+    } catch (error) {
+      console.error("Error fetching agent:", error);
+      res.status(500).json({ message: "Failed to fetch agent" });
+    }
+  });
+
+  app.patch("/api/agents/:id", async (req, res) => {
+    try {
+      const updatedAgent = await storage.updateAgent(parseInt(req.params.id), req.body);
+      res.json(updatedAgent);
+    } catch (error) {
+      console.error("Error updating agent:", error);
+      res.status(500).json({ message: "Failed to update agent" });
+    }
+  });
+
+  // APPOINTMENTS - Advanced scheduling system
+  app.get("/api/appointments", async (req, res) => {
+    try {
+      const { agentId, leadId, propertyId, type, status, dateFrom, dateTo } = req.query;
+      const appointments = await storage.getAppointments({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        leadId: leadId ? parseInt(leadId as string) : undefined,
+        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
+        type: type as string,
+        status: status as string,
+        dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
+        dateTo: dateTo ? new Date(dateTo as string) : undefined
+      });
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+
+  app.post("/api/appointments", async (req, res) => {
+    try {
+      const appointment = insertAppointmentSchema.parse(req.body);
+      const newAppointment = await storage.createAppointment(appointment);
+      res.json(newAppointment);
+    } catch (error) {
+      console.error("Error creating appointment:", error);
+      res.status(400).json({ message: "Invalid appointment data" });
+    }
+  });
+
+  app.patch("/api/appointments/:id", async (req, res) => {
+    try {
+      const updatedAppointment = await storage.updateAppointment(parseInt(req.params.id), req.body);
+      res.json(updatedAppointment);
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      res.status(500).json({ message: "Failed to update appointment" });
+    }
+  });
+
+  // CONTRACTS - Digital offer management
+  app.get("/api/contracts", async (req, res) => {
+    try {
+      const { agentId, propertyId, status, type } = req.query;
+      const contracts = await storage.getContracts({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
+        status: status as string,
+        type: type as string
+      });
+      res.json(contracts);
+    } catch (error) {
+      console.error("Error fetching contracts:", error);
+      res.status(500).json({ message: "Failed to fetch contracts" });
+    }
+  });
+
+  app.post("/api/contracts", async (req, res) => {
+    try {
+      const contract = insertContractSchema.parse(req.body);
+      const newContract = await storage.createContract(contract);
+      res.json(newContract);
+    } catch (error) {
+      console.error("Error creating contract:", error);
+      res.status(400).json({ message: "Invalid contract data" });
+    }
+  });
+
+  app.patch("/api/contracts/:id", async (req, res) => {
+    try {
+      const updatedContract = await storage.updateContract(parseInt(req.params.id), req.body);
+      res.json(updatedContract);
+    } catch (error) {
+      console.error("Error updating contract:", error);
+      res.status(500).json({ message: "Failed to update contract" });
+    }
+  });
+
+  // COMMISSIONS - Financial tracking
+  app.get("/api/commissions", async (req, res) => {
+    try {
+      const { agentId, status } = req.query;
+      const commissions = await storage.getCommissions({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        status: status as string
+      });
+      res.json(commissions);
+    } catch (error) {
+      console.error("Error fetching commissions:", error);
+      res.status(500).json({ message: "Failed to fetch commissions" });
+    }
+  });
+
+  app.post("/api/commissions", async (req, res) => {
+    try {
+      const commission = insertCommissionSchema.parse(req.body);
+      const newCommission = await storage.createCommission(commission);
+      res.json(newCommission);
+    } catch (error) {
+      console.error("Error creating commission:", error);
+      res.status(400).json({ message: "Invalid commission data" });
+    }
+  });
+
+  // MARKETING CAMPAIGNS - Automated marketing
+  app.get("/api/marketing-campaigns", async (req, res) => {
+    try {
+      const { agentId, status, type } = req.query;
+      const campaigns = await storage.getMarketingCampaigns({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        status: status as string,
+        type: type as string
+      });
+      res.json(campaigns);
+    } catch (error) {
+      console.error("Error fetching marketing campaigns:", error);
+      res.status(500).json({ message: "Failed to fetch marketing campaigns" });
+    }
+  });
+
+  app.post("/api/marketing-campaigns", async (req, res) => {
+    try {
+      const campaign = insertMarketingCampaignSchema.parse(req.body);
+      const newCampaign = await storage.createMarketingCampaign(campaign);
+      res.json(newCampaign);
+    } catch (error) {
+      console.error("Error creating marketing campaign:", error);
+      res.status(400).json({ message: "Invalid campaign data" });
+    }
+  });
+
+  app.patch("/api/marketing-campaigns/:id", async (req, res) => {
+    try {
+      const updatedCampaign = await storage.updateMarketingCampaign(parseInt(req.params.id), req.body);
+      res.json(updatedCampaign);
+    } catch (error) {
+      console.error("Error updating marketing campaign:", error);
+      res.status(500).json({ message: "Failed to update marketing campaign" });
+    }
+  });
+
+  // ADVANCED LEADS ENDPOINT - Enhanced filtering
+  app.get("/api/leads", async (req, res) => {
+    try {
+      const { status, priority, buyerType, timeframe, minBudget, maxBudget, tags, agentId, limit, offset } = req.query;
+      const leads = await storage.getLeads({
+        status: status as string,
+        priority: priority ? parseInt(priority as string) : undefined,
+        buyerType: buyerType as string,
+        timeframe: timeframe as string,
+        minBudget: minBudget ? parseFloat(minBudget as string) : undefined,
+        maxBudget: maxBudget ? parseFloat(maxBudget as string) : undefined,
+        tags: tags ? (tags as string).split(',') : undefined,
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        limit: limit ? parseInt(limit as string) : undefined,
+        offset: offset ? parseInt(offset as string) : undefined
+      });
+      res.json(leads);
+    } catch (error) {
+      console.error("Error fetching leads:", error);
+      res.status(500).json({ message: "Failed to fetch leads" });
+    }
+  });
+
+  // ANALYTICS - Agent performance dashboard
+  app.get("/api/analytics/agent-performance/:agentId", async (req, res) => {
+    try {
+      const agentId = parseInt(req.params.agentId);
+      const { dateFrom, dateTo } = req.query;
+      
+      const performance = await storage.getAgentPerformance(
+        agentId,
+        dateFrom ? new Date(dateFrom as string) : undefined,
+        dateTo ? new Date(dateTo as string) : undefined
+      );
+      
+      res.json(performance);
+    } catch (error) {
+      console.error("Error fetching agent performance:", error);
+      res.status(500).json({ message: "Failed to fetch agent performance" });
+    }
+  });
+
+  // ADVANCED SEARCH - Multi-entity search
+  app.get("/api/search/leads", async (req, res) => {
+    try {
+      const { q } = req.query;
+      if (!q) {
+        return res.status(400).json({ message: "Search query is required" });
+      }
+      
+      const leads = await storage.searchLeads(q as string);
+      res.json(leads);
+    } catch (error) {
+      console.error("Error searching leads:", error);
+      res.status(500).json({ message: "Search failed" });
     }
   });
 

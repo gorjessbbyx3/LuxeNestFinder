@@ -23,10 +23,10 @@ export default function MapSearch() {
   const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
 
   const overlayTypes = [
-    { id: "safety", label: "Safety", icon: Shield, color: "bg-red-500" },
+    { id: "beaches", label: "Beaches", icon: Sun, color: "bg-blue-400" },
     { id: "schools", label: "Schools", icon: GraduationCap, color: "bg-blue-500" },
-    { id: "commute", label: "Commute", icon: Car, color: "bg-green-500" },
-    { id: "sunlight", label: "Sunlight", icon: Sun, color: "bg-orange-500" },
+    { id: "safety", label: "Safety", icon: Shield, color: "bg-green-500" },
+    { id: "volcano", label: "Volcano Views", icon: Home, color: "bg-red-500" },
   ];
 
   const mockProperties = [
@@ -37,17 +37,17 @@ export default function MapSearch() {
       beds: 5, 
       baths: 4, 
       sqft: "4,500",
-      position: { top: "25%", left: "33%" },
+      position: { top: "35%", left: "28%" }, // Maui position
       image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
     },
     { 
       id: 2, 
       price: "$3.2M", 
-      title: "Kailua Modern Estate",
+      title: "Kailua Beach Estate",
       beds: 4, 
       baths: 3, 
       sqft: "3,100",
-      position: { top: "50%", left: "25%" },
+      position: { top: "42%", left: "45%" }, // Oahu/Kailua position
       image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
     },
     { 
@@ -57,8 +57,18 @@ export default function MapSearch() {
       beds: 6, 
       baths: 5, 
       sqft: "5,800",
-      position: { top: "75%", left: "66%" },
+      position: { top: "65%", left: "58%" }, // Big Island position
       image: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
+    },
+    { 
+      id: 4, 
+      price: "$5.3M", 
+      title: "Kauai Garden Isle Retreat",
+      beds: 4, 
+      baths: 4, 
+      sqft: "4,200",
+      position: { top: "38%", left: "15%" }, // Kauai position
+      image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&h=150"
     },
   ];
 
@@ -145,8 +155,8 @@ export default function MapSearch() {
         <div className="relative h-96 lg:h-[600px] bg-gradient-to-br from-muted to-background">
           {/* Map Background */}
           <img
-            src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600"
-            alt="Interactive map of Hawaiian islands"
+            src="https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&h=600"
+            alt="Interactive satellite map of Hawaiian islands showing Oahu, Maui, Big Island, and Kauai"
             className="w-full h-full object-cover"
           />
           
@@ -245,7 +255,7 @@ export default function MapSearch() {
         <div className="p-6 bg-muted">
           <div className="flex items-center justify-between">
             <div className="text-sm text-muted-foreground">
-              Found <span className="font-semibold text-primary">247 properties</span> in current view
+              Found <span className="font-semibold text-primary">{mockProperties.length} luxury properties</span> across Hawaiian islands
             </div>
             <div className="flex items-center gap-4">
               <Button variant="ghost" size="sm">
