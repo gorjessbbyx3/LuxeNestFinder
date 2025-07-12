@@ -122,14 +122,16 @@ export default function Footer() {
               <Shield className="h-3 w-3" />
               <span>Licensed Real Estate Platform</span>
             </div>
-            <Button 
-              size="sm" 
-              variant="ghost" 
-              className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500"
-            >
-              <Users className="h-3 w-3 mr-2" />
-              Agent Portal
-            </Button>
+            <Link href="/agent-portal">
+              <Button 
+                size="sm" 
+                variant="ghost" 
+                className="text-xs text-gray-400 hover:text-white border border-gray-700 hover:border-gray-500"
+              >
+                <Users className="h-3 w-3 mr-2" />
+                Agent Portal
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

@@ -10,6 +10,7 @@ import PropertyDetail from "@/pages/property-detail";
 import VirtualTours from "@/pages/virtual-tours";
 import Neighborhoods from "@/pages/neighborhoods";
 import SellYourHome from "@/pages/sell-your-home";
+import AgentPortal from "@/pages/agent-portal";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/virtual-tours" component={VirtualTours} />
       <Route path="/neighborhoods" component={Neighborhoods} />
       <Route path="/sell-your-home" component={SellYourHome} />
+      <Route path="/agent-portal" component={AgentPortal} />
       <Route component={NotFound} />
     </Switch>
   );

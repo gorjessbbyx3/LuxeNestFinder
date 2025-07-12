@@ -14,6 +14,8 @@ import { Separator } from '@/components/ui/separator';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
+import Navigation from '@/components/navigation';
+import Footer from '@/components/footer';
 import { 
   Home, 
   DollarSign, 
@@ -160,8 +162,9 @@ export default function SellYourHomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-blue-900">
+      <Navigation />
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-16">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-16 pt-24">
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -697,6 +700,7 @@ export default function SellYourHomePage() {
           </motion.div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
