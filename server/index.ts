@@ -38,6 +38,11 @@ app.use((req, res, next) => {
 
 (async () => {
   const server = await registerRoutes(app);
+  
+  // Start open house scraper scheduler
+  log("🏠 Starting Open House Scraper - Friday 3:35 PM HST Schedule");
+  const { openHouseScraper } = await import("./lib/open-house-scraper");
+  openHouseScraper.startScheduler();
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

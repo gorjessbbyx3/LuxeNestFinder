@@ -329,6 +329,36 @@ export const homeValuations = pgTable("home_valuations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Open Houses table
+export const openHouses = pgTable("open_houses", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id),
+  mlsNumber: text("mls_number"),
+  title: text("title").notNull(),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  state: text("state").default("HI"),
+  zipCode: text("zip_code"),
+  price: decimal("price", { precision: 12, scale: 2 }),
+  bedrooms: integer("bedrooms"),
+  bathrooms: decimal("bathrooms", { precision: 3, scale: 1 }),
+  squareFeet: integer("square_feet"),
+  lotSize: decimal("lot_size", { precision: 8, scale: 2 }),
+  propertyType: text("property_type"),
+  dateTime: timestamp("date_time").notNull(),
+  endTime: timestamp("end_time"),
+  hostAgent: text("host_agent"),
+  hostPhone: text("host_phone"),
+  hostEmail: text("host_email"),
+  description: text("description"),
+  images: json("images").$type<string[]>().default([]),
+  source: text("source").default("HBR"), // Hawaii Board of Realtors
+  sourceUrl: text("source_url"),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // ADVANCED RELATIONS - Enterprise-grade data relationships
 export const propertiesRelations = relations(properties, ({ many }) => ({
   inquiries: many(propertyInquiries),
@@ -501,6 +531,12 @@ export const insertMarketPredictionSchema = createInsertSchema(marketPredictions
   createdAt: true,
 });
 
+export const insertOpenHouseSchema = createInsertSchema(openHouses).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // COMPREHENSIVE TYPE DEFINITIONS
 export type Property = typeof properties.$inferSelect;
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
@@ -537,3 +573,6 @@ export type InsertHomeValuation = z.infer<typeof insertHomeValuationSchema>;
 
 export type MarketPrediction = typeof marketPredictions.$inferSelect;
 export type InsertMarketPrediction = z.infer<typeof insertMarketPredictionSchema>;
+
+export type OpenHouse = typeof openHouses.$inferSelect;
+export type InsertOpenHouse = z.infer<typeof insertOpenHouseSchema>;

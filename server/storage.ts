@@ -34,7 +34,10 @@ import {
   type HomeValuation,
   type InsertHomeValuation,
   type MarketPrediction,
-  type InsertMarketPrediction
+  type InsertMarketPrediction,
+  openHouses,
+  type OpenHouse,
+  type InsertOpenHouse
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, sql, between, ilike } from "drizzle-orm";
@@ -153,6 +156,11 @@ export interface IStorage {
   createMarketPrediction(prediction: InsertMarketPrediction): Promise<MarketPrediction>;
   getMarketPrediction(id: number): Promise<MarketPrediction | undefined>;
   getMarketPredictions(propertyId?: number): Promise<MarketPrediction[]>;
+  
+  // Open Houses
+  getOpenHouses(filters?: { active?: boolean; upcoming?: boolean }): Promise<OpenHouse[]>;
+  createOpenHouse(openHouse: InsertOpenHouse): Promise<OpenHouse>;
+  updateOpenHouse(id: number, openHouse: Partial<InsertOpenHouse>): Promise<OpenHouse>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -639,6 +647,43 @@ export class DatabaseStorage implements IStorage {
       return await db.select().from(marketPredictions).where(eq(marketPredictions.propertyId, propertyId));
     }
     return await db.select().from(marketPredictions).orderBy(desc(marketPredictions.createdAt));
+  }
+
+  // Open Houses
+  async getOpenHouses(filters?: { active?: boolean; upcoming?: boolean }): Promise<OpenHouse[]> {
+    try {
+      let query = db.select().from(openHouses);
+      
+      if (filters?.active !== undefined) {
+        query = query.where(eq(openHouses.isActive, filters.active));
+      }
+      
+      if (filters?.upcoming) {
+        const now = new Date();
+        query = query.where(and(
+          eq(openHouses.isActive, true),
+          sql`${openHouses.dateTime} >= ${now}`
+        ));
+      }
+      
+      return await query.orderBy(asc(openHouses.dateTime));
+    } catch (error) {
+      console.error("Error fetching open houses:", error);
+      return [];
+    }
+  }
+
+  async createOpenHouse(openHouse: InsertOpenHouse): Promise<OpenHouse> {
+    const [newOpenHouse] = await db.insert(openHouses).values(openHouse).returning();
+    return newOpenHouse;
+  }
+
+  async updateOpenHouse(id: number, openHouse: Partial<InsertOpenHouse>): Promise<OpenHouse> {
+    const [updated] = await db.update(openHouses)
+      .set({ ...openHouse, updatedAt: new Date() })
+      .where(eq(openHouses.id, id))
+      .returning();
+    return updated;
   }
 }
 

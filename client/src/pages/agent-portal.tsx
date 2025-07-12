@@ -101,6 +101,11 @@ export default function AgentPortalPage() {
     staleTime: 5 * 60 * 1000,
   });
 
+  const { data: openHouses = [], isLoading: openHousesLoading } = useQuery({
+    queryKey: ['/api/open-houses'],
+    staleTime: 2 * 60 * 1000,
+  });
+
   // Mutations for real-time updates
   const createLeadMutation = useMutation({
     mutationFn: (leadData: any) => apiRequest('/api/leads', 'POST', leadData),
@@ -303,7 +308,7 @@ export default function AgentPortalPage() {
           transition={{ delay: 0.2 }}
         >
           <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-7 bg-gradient-to-r from-blue-100 to-purple-100 p-1 rounded-xl">
+            <TabsList className="grid w-full grid-cols-8 bg-gradient-to-r from-blue-100 to-purple-100 p-1 rounded-xl">
               <TabsTrigger value="dashboard" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
                 <Users className="h-4 w-4 mr-2" />
                 Dashboard
@@ -311,6 +316,10 @@ export default function AgentPortalPage() {
               <TabsTrigger value="leads" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
                 <Target className="h-4 w-4 mr-2" />
                 Leads
+              </TabsTrigger>
+              <TabsTrigger value="open-houses" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Home className="h-4 w-4 mr-2" />
+                Open Houses
               </TabsTrigger>
               <TabsTrigger value="calendar" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
                 <CalendarIcon className="h-4 w-4 mr-2" />
@@ -1210,6 +1219,236 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
+              </div>
+            </TabsContent>
+
+            {/* Open Houses Tab */}
+            <TabsContent value="open-houses" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900">Open House Management</h1>
+                  <p className="text-gray-600 mt-2">Manage Hawaii Board of Realtors open house listings</p>
+                </div>
+                <div className="flex gap-3">
+                  <Button 
+                    onClick={async () => {
+                      try {
+                        await apiRequest('/api/open-houses/sync', 'POST');
+                        queryClient.invalidateQueries({ queryKey: ['/api/open-houses'] });
+                        toast({
+                          title: "Open Houses Updated",
+                          description: "Successfully synced with HBR report",
+                        });
+                      } catch (error) {
+                        toast({
+                          title: "Sync Failed",
+                          description: "Unable to update open houses",
+                          variant: "destructive",
+                        });
+                      }
+                    }}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Sync Now
+                  </Button>
+                  <Badge className="bg-blue-600 text-white px-3 py-1">
+                    Auto-updates Friday 3:35 PM
+                  </Badge>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {openHousesLoading ? (
+                  Array.from({ length: 6 }).map((_, i) => (
+                    <Card key={i} className="animate-pulse">
+                      <div className="h-48 bg-gray-200 rounded-t-lg"></div>
+                      <CardContent className="p-4 space-y-3">
+                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                        <div className="h-8 bg-gray-200 rounded"></div>
+                      </CardContent>
+                    </Card>
+                  ))
+                ) : openHouses.length === 0 ? (
+                  <div className="col-span-full text-center py-12">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-8 max-w-md mx-auto">
+                      <Home className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-blue-700 mb-2">
+                        No Open Houses Scheduled
+                      </h3>
+                      <p className="text-blue-600 text-sm mb-4">
+                        Open houses are automatically updated every Friday at 3:35 PM from the Hawaii Board of Realtors report.
+                      </p>
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await apiRequest('/api/open-houses/sync', 'POST');
+                            queryClient.invalidateQueries({ queryKey: ['/api/open-houses'] });
+                            toast({
+                              title: "Manual Sync Triggered",
+                              description: "Checking for new open houses...",
+                            });
+                          } catch (error) {
+                            toast({
+                              title: "Sync Failed",
+                              description: "Unable to update open houses",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <RefreshCw className="h-4 w-4 mr-2" />
+                        Sync Now
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  openHouses.map((openHouse: any) => {
+                    const openDate = new Date(openHouse.dateTime);
+                    const endDate = openHouse.endTime ? new Date(openHouse.endTime) : null;
+                    const image = openHouse.images?.[0] || "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400";
+                    
+                    return (
+                      <motion.div
+                        key={openHouse.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+                          <div className="relative h-48">
+                            <img 
+                              src={image}
+                              alt={openHouse.title}
+                              className="w-full h-full object-cover"
+                            />
+                            
+                            {/* MLS Badge */}
+                            <div className="absolute top-3 left-3">
+                              {openHouse.mlsNumber && (
+                                <Badge className="bg-green-600 text-white font-semibold">
+                                  MLS #{openHouse.mlsNumber}
+                                </Badge>
+                              )}
+                            </div>
+                            
+                            {/* Price Badge */}
+                            <div className="absolute top-3 right-3">
+                              <Badge className="bg-primary text-primary-foreground font-bold">
+                                ${Number(openHouse.price).toLocaleString()}
+                              </Badge>
+                            </div>
+                            
+                            {/* Status Badge */}
+                            <div className="absolute bottom-3 left-3">
+                              <Badge className={openHouse.isActive ? "bg-blue-600 text-white" : "bg-gray-600 text-white"}>
+                                {openHouse.isActive ? "Active" : "Completed"}
+                              </Badge>
+                            </div>
+                          </div>
+                          
+                          <CardContent className="p-4">
+                            <h3 className="font-bold text-lg mb-2 line-clamp-2">{openHouse.title}</h3>
+                            <p className="text-muted-foreground text-sm flex items-center mb-3">
+                              <MapPin className="h-4 w-4 mr-1" />
+                              {openHouse.address}, {openHouse.city}
+                            </p>
+                            
+                            {/* Property Stats */}
+                            <div className="grid grid-cols-3 gap-2 text-center mb-3">
+                              <div>
+                                <div className="font-semibold">{openHouse.bedrooms}</div>
+                                <div className="text-xs text-muted-foreground">Beds</div>
+                              </div>
+                              <div>
+                                <div className="font-semibold">{openHouse.bathrooms}</div>
+                                <div className="text-xs text-muted-foreground">Baths</div>
+                              </div>
+                              <div>
+                                <div className="font-semibold">{openHouse.squareFeet?.toLocaleString()}</div>
+                                <div className="text-xs text-muted-foreground">Sq Ft</div>
+                              </div>
+                            </div>
+                            
+                            {/* Date & Time */}
+                            <div className="bg-muted rounded-lg p-3 mb-3">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center">
+                                  <CalendarIcon className="h-4 w-4 text-primary mr-2" />
+                                  <div>
+                                    <div className="font-semibold text-sm">
+                                      {openDate.toLocaleDateString('en-US', { 
+                                        weekday: 'short', 
+                                        month: 'short', 
+                                        day: 'numeric' 
+                                      })}
+                                    </div>
+                                    <div className="text-xs text-muted-foreground">
+                                      {openDate.toLocaleTimeString('en-US', { 
+                                        hour: 'numeric', 
+                                        minute: '2-digit' 
+                                      })}
+                                      {endDate && ` - ${endDate.toLocaleTimeString('en-US', { 
+                                        hour: 'numeric', 
+                                        minute: '2-digit' 
+                                      })}`}
+                                    </div>
+                                  </div>
+                                </div>
+                                <Clock className="h-4 w-4 text-muted-foreground" />
+                              </div>
+                            </div>
+                            
+                            {/* Host Information */}
+                            {openHouse.hostAgent && (
+                              <div className="border-t pt-3 mb-3">
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <div className="font-semibold text-sm">{openHouse.hostAgent}</div>
+                                    <div className="text-xs text-muted-foreground">Host Agent</div>
+                                  </div>
+                                  <div className="flex gap-1">
+                                    {openHouse.hostPhone && (
+                                      <Button size="icon" variant="outline" className="h-7 w-7">
+                                        <Phone className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                    {openHouse.hostEmail && (
+                                      <Button size="icon" variant="outline" className="h-7 w-7">
+                                        <Mail className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Actions */}
+                            <div className="flex gap-2">
+                              <Button size="sm" className="flex-1">
+                                <Eye className="h-3 w-3 mr-1" />
+                                View Details
+                              </Button>
+                              <Button size="sm" variant="outline" className="flex-1">
+                                <CalendarIcon className="h-3 w-3 mr-1" />
+                                Add to Calendar
+                              </Button>
+                            </div>
+                            
+                            {/* Source */}
+                            <div className="mt-3 pt-3 border-t text-xs text-muted-foreground flex justify-between">
+                              <span>Source: Hawaii Board of Realtors</span>
+                              <span>Auto-updated</span>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    );
+                  })
+                )}
               </div>
             </TabsContent>
 

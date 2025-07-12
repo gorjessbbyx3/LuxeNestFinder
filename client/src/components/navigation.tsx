@@ -13,7 +13,6 @@ export default function Navigation() {
 
   const navigation = [
     { name: "Properties", href: "/properties" },
-    { name: "MLS Listings", href: "/mls-listings" },
     { name: "Virtual Tours", href: "/virtual-tours" },
     { name: "Neighborhoods", href: "/neighborhoods" },
     { name: "Sell Your Home", href: "/sell-your-home" },

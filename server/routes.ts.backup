@@ -876,8 +876,8 @@ function calculateLifestyleMatch(property: any, preferences: any): number | null
   return factors > 0 ? Math.min(Math.round(score / factors * 4), 100) : null;
 }
 
-  // Open House API endpoints
-  app.get("/api/open-houses", async (req, res) => {
+// Open House API endpoints
+app.get("/api/open-houses", async (req, res) => {
   try {
     const { active, upcoming } = req.query;
     const filters = {

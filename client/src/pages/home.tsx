@@ -6,6 +6,7 @@ import RealEstateMap from "@/components/real-estate-map";
 import VirtualTourViewer from "@/components/virtual-tour-viewer";
 import AIChat from "@/components/ai-chat";
 import PropertyComparison from "@/components/property-comparison";
+import OpenHouseComponent from "@/components/open-house-component";
 import FloatingActions from "@/components/floating-actions";
 import Footer from "@/components/footer";
 import { useProperties } from "@/hooks/use-properties";
@@ -101,15 +102,10 @@ export default function Home() {
             )}
           </div>
           
-          <div className="text-center flex gap-4 justify-center">
+          <div className="text-center">
             <Link href="/properties">
               <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-                View All Properties
-              </Button>
-            </Link>
-            <Link href="/mls-listings">
-              <Button size="lg" variant="outline">
-                Browse MLS Listings
+                View All MLS Properties
               </Button>
             </Link>
           </div>
@@ -160,7 +156,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Neighborhood Spotlight */}
+      {/* Open House Listings */}
       <section className="py-20 px-4 bg-muted">
         <div className="max-w-7xl mx-auto">
           <motion.div
@@ -170,77 +166,21 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
+            <div className="flex justify-center mb-4">
+              <Badge className="bg-blue-600 text-white px-4 py-2 text-sm font-semibold">
+                <Shield className="h-4 w-4 mr-2" />
+                Updated Every Friday 3:35 PM
+              </Badge>
+            </div>
             <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-6 text-primary">
-              Neighborhood Spotlight
+              Hawaii Open Houses
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Discover what makes each Hawaiian neighborhood special with AI-powered insights and local expertise.
+              Authentic open house listings from Hawaii Board of Realtors. Automatically updated weekly from official HBR reports.
             </p>
           </motion.div>
           
-          <div className="grid lg:grid-cols-3 gap-8">
-            {neighborhoodsLoading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="space-y-4">
-                  <Skeleton className="h-48 w-full rounded-2xl" />
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-2/3" />
-                </div>
-              ))
-            ) : (
-              neighborhoods?.slice(0, 3).map((neighborhood: any) => (
-                <motion.div
-                  key={neighborhood.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  viewport={{ once: true }}
-                  className="bg-card rounded-2xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow"
-                >
-                  <div className="relative h-48">
-                    <img 
-                      src={neighborhood.image || "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=300"} 
-                      alt={neighborhood.name}
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                    <div className="absolute bottom-4 left-4 text-white">
-                      <h3 className="text-xl font-bold">{neighborhood.name}</h3>
-                      <p className="text-sm opacity-90">{neighborhood.city}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <div className="grid grid-cols-3 gap-4 mb-4 text-center">
-                      <div>
-                        <div className="text-lg font-bold text-primary">{neighborhood.safetyScore || '9.2'}</div>
-                        <div className="text-xs text-muted-foreground">Safety Score</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-primary">{neighborhood.schoolRating || '8.7'}</div>
-                        <div className="text-xs text-muted-foreground">Schools</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold text-primary">
-                          ${neighborhood.averagePrice ? `${(Number(neighborhood.averagePrice) / 1000000).toFixed(1)}M` : '2.1M'}
-                        </div>
-                        <div className="text-xs text-muted-foreground">Avg Price</div>
-                      </div>
-                    </div>
-                    
-                    <p className="text-muted-foreground text-sm mb-4">
-                      {neighborhood.description || "Discover luxury living in this premier Hawaiian neighborhood."}
-                    </p>
-                    
-                    <Button className="w-full">
-                      Explore {neighborhood.name} Properties
-                    </Button>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
+          <OpenHouseComponent />
         </div>
       </section>
 
