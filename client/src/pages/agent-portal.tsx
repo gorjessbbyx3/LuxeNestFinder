@@ -50,7 +50,18 @@ import {
   Bell,
   Settings,
   Inbox,
-  UserPlus
+  UserPlus,
+  User,
+  Video,
+  AlertCircle,
+  ChevronLeft,
+  Reply,
+  Archive,
+  MoreVertical,
+  MessageSquare,
+  StarOff,
+  Forward,
+  Inbox as InboxIcon
 } from 'lucide-react';
 
 export default function AgentPortalPage() {
@@ -1400,18 +1411,79 @@ function NewLeadForm({ onSubmit }: { onSubmit: (data: any) => void }) {
   );
 }
 
-// Embedded Calendar Component for Agent Portal
+// Full-Featured Calendar Component for Agent Portal
 function EmbeddedCalendar() {
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [viewMode, setViewMode] = useState<'month' | 'week'>('week');
-  
-  const { data: appointments = [] } = useQuery({
+  const [isNewAppointmentOpen, setIsNewAppointmentOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<'month' | 'week' | 'day'>('week');
+  const [filterType, setFilterType] = useState<string>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const MONTHS = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+  const APPOINTMENT_TYPES = [
+    { value: 'property_showing', label: 'Property Showing', icon: Home, color: 'bg-blue-500' },
+    { value: 'client_meeting', label: 'Client Meeting', icon: Users, color: 'bg-green-500' },
+    { value: 'listing_appointment', label: 'Listing Appointment', icon: Building, color: 'bg-purple-500' },
+    { value: 'consultation', label: 'Consultation', icon: User, color: 'bg-orange-500' },
+    { value: 'virtual_tour', label: 'Virtual Tour', icon: Video, color: 'bg-pink-500' },
+    { value: 'closing', label: 'Closing', icon: CheckCircle, color: 'bg-emerald-500' }
+  ];
+
+  // Fetch appointments and related data
+  const { data: appointments = [], isLoading: appointmentsLoading } = useQuery({
     queryKey: ['/api/appointments'],
     staleTime: 60 * 1000,
+    refetchInterval: 2 * 60 * 1000,
   });
 
+  const { data: leads = [] } = useQuery({
+    queryKey: ['/api/leads'],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const { data: properties = [] } = useQuery({
+    queryKey: ['/api/properties'],
+    staleTime: 5 * 60 * 1000,
+  });
+
+  // Create appointment mutation
+  const createAppointmentMutation = useMutation({
+    mutationFn: async (appointmentData: any) => {
+      const response = await apiRequest('/api/appointments', {
+        method: 'POST',
+        body: JSON.stringify(appointmentData),
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/appointments'] });
+      setIsNewAppointmentOpen(false);
+      toast({
+        title: "Success!",
+        description: "Appointment created successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create appointment",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Calendar calculations
   const weekDays = useMemo(() => {
-    const start = new Date(selectedDate);
+    const start = new Date(currentDate);
     start.setDate(start.getDate() - start.getDay());
     
     const days = [];
@@ -1421,71 +1493,207 @@ function EmbeddedCalendar() {
       days.push(day);
     }
     return days;
-  }, [selectedDate]);
+  }, [currentDate]);
+
+  const monthDays = useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDate = new Date(firstDay);
+    startDate.setDate(startDate.getDate() - startDate.getDay());
+    
+    const days = [];
+    for (let i = 0; i < 42; i++) {
+      const day = new Date(startDate);
+      day.setDate(startDate.getDate() + i);
+      days.push(day);
+    }
+    return days;
+  }, [currentDate]);
 
   const getAppointmentsForDay = (date: Date) => {
     return appointments.filter(appointment => {
       const appointmentDate = new Date(appointment.scheduledAt);
       return appointmentDate.toDateString() === date.toDateString();
+    }).filter(appointment => {
+      if (filterType === 'all') return true;
+      return appointment.type === filterType;
+    }).filter(appointment => {
+      if (!searchTerm) return true;
+      return appointment.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+             appointment.description?.toLowerCase().includes(searchTerm.toLowerCase());
     });
   };
 
+  const getAppointmentTypeConfig = (type: string) => {
+    return APPOINTMENT_TYPES.find(t => t.value === type) || APPOINTMENT_TYPES[0];
+  };
+
+  const navigateDate = (direction: 'prev' | 'next') => {
+    const newDate = new Date(currentDate);
+    if (viewMode === 'month') {
+      newDate.setMonth(newDate.getMonth() + (direction === 'next' ? 1 : -1));
+    } else if (viewMode === 'week') {
+      newDate.setDate(newDate.getDate() + (direction === 'next' ? 7 : -7));
+    } else {
+      newDate.setDate(newDate.getDate() + (direction === 'next' ? 1 : -1));
+    }
+    setCurrentDate(newDate);
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Calendar Overview</h3>
-        <div className="flex gap-2">
+    <div className="space-y-6">
+      {/* Calendar Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex items-center gap-4">
           <Button
+            variant="outline"
             size="sm"
-            variant={viewMode === 'week' ? 'default' : 'outline'}
-            onClick={() => setViewMode('week')}
+            onClick={() => navigateDate('prev')}
+            className="h-8 w-8 p-0"
           >
-            Week
+            <ChevronLeft className="h-4 w-4" />
           </Button>
+          
+          <div className="text-xl font-bold">
+            {viewMode === 'month' ? (
+              `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`
+            ) : viewMode === 'week' ? (
+              `Week of ${weekDays[0]?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`
+            ) : (
+              selectedDate.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'long', 
+                day: 'numeric',
+                year: 'numeric'
+              })
+            )}
+          </div>
+          
           <Button
+            variant="outline"
             size="sm"
-            variant={viewMode === 'month' ? 'default' : 'outline'}
-            onClick={() => setViewMode('month')}
+            onClick={() => navigateDate('next')}
+            className="h-8 w-8 p-0"
           >
-            Month
+            <ChevronRight className="h-4 w-4" />
           </Button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="flex gap-1">
+            {['month', 'week', 'day'].map((mode) => (
+              <Button
+                key={mode}
+                size="sm"
+                variant={viewMode === mode ? 'default' : 'outline'}
+                onClick={() => setViewMode(mode as 'month' | 'week' | 'day')}
+                className="capitalize"
+              >
+                {mode}
+              </Button>
+            ))}
+          </div>
+          
+          <Dialog open={isNewAppointmentOpen} onOpenChange={setIsNewAppointmentOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="h-4 w-4 mr-2" />
+                New Appointment
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-2xl">
+              <DialogHeader>
+                <DialogTitle>Create New Appointment</DialogTitle>
+              </DialogHeader>
+              <AppointmentForm
+                onSubmit={createAppointmentMutation.mutate}
+                leads={leads}
+                properties={properties}
+                selectedDate={selectedDate}
+                appointmentTypes={APPOINTMENT_TYPES}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
+      {/* Filter Controls */}
+      <div className="flex flex-wrap gap-4 items-center">
+        <div className="flex items-center gap-2">
+          <Filter className="h-4 w-4 text-gray-500" />
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value)}
+            className="text-sm border rounded-lg px-3 py-1"
+          >
+            <option value="all">All Types</option>
+            {APPOINTMENT_TYPES.map(type => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Search className="h-4 w-4 text-gray-500" />
+          <Input
+            placeholder="Search appointments..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-64"
+          />
+        </div>
+      </div>
+
+      {/* Calendar Grid */}
       {viewMode === 'week' && (
         <div className="grid grid-cols-7 gap-2">
+          {DAYS.map((day) => (
+            <div key={day} className="p-2 text-center font-medium text-gray-600 bg-gray-50 rounded-t-lg">
+              {day}
+            </div>
+          ))}
           {weekDays.map((day, index) => {
             const dayAppointments = getAppointmentsForDay(day);
             const isToday = day.toDateString() === new Date().toDateString();
+            const isCurrentMonth = day.getMonth() === currentDate.getMonth();
             
             return (
               <div
                 key={index}
-                className={`p-3 border rounded-lg min-h-[120px] ${
-                  isToday ? 'bg-blue-50 border-blue-200' : 'bg-white hover:bg-gray-50'
+                className={`p-3 border rounded-lg min-h-[150px] cursor-pointer transition-colors ${
+                  isToday 
+                    ? 'bg-blue-50 border-blue-200' 
+                    : isCurrentMonth 
+                      ? 'bg-white hover:bg-gray-50' 
+                      : 'bg-gray-50 text-gray-400'
                 }`}
+                onClick={() => setSelectedDate(day)}
               >
-                <div className={`text-sm font-medium mb-2 ${isToday ? 'text-blue-600' : 'text-gray-600'}`}>
-                  {day.toLocaleDateString('en-US', { weekday: 'short' })}
-                </div>
-                <div className={`text-lg font-bold mb-2 ${isToday ? 'text-blue-600' : ''}`}>
+                <div className={`text-sm font-medium mb-2 ${isToday ? 'text-blue-600' : ''}`}>
                   {day.getDate()}
                 </div>
                 <div className="space-y-1">
-                  {dayAppointments.slice(0, 2).map((appointment, idx) => (
-                    <div
-                      key={idx}
-                      className="text-xs bg-blue-100 text-blue-800 p-1 rounded truncate"
-                      title={appointment.title}
-                    >
-                      {new Date(appointment.scheduledAt).toLocaleTimeString('en-US', { 
-                        hour: 'numeric', 
-                        minute: '2-digit' 
-                      })} {appointment.title}
-                    </div>
-                  ))}
-                  {dayAppointments.length > 2 && (
-                    <div className="text-xs text-gray-500">+{dayAppointments.length - 2} more</div>
+                  {dayAppointments.slice(0, 3).map((appointment, idx) => {
+                    const typeConfig = getAppointmentTypeConfig(appointment.type);
+                    return (
+                      <div
+                        key={idx}
+                        className={`text-xs p-1 rounded truncate text-white ${typeConfig.color}`}
+                        title={appointment.title}
+                      >
+                        {new Date(appointment.scheduledAt).toLocaleTimeString('en-US', { 
+                          hour: 'numeric', 
+                          minute: '2-digit' 
+                        })} {appointment.title}
+                      </div>
+                    );
+                  })}
+                  {dayAppointments.length > 3 && (
+                    <div className="text-xs text-gray-500">+{dayAppointments.length - 3} more</div>
                   )}
                 </div>
               </div>
@@ -1493,22 +1701,107 @@ function EmbeddedCalendar() {
           })}
         </div>
       )}
+
+      {/* Appointments List */}
+      <div className="mt-6">
+        <h3 className="text-lg font-semibold mb-4">
+          {viewMode === 'day' ? 'Today\'s Appointments' : 'Upcoming Appointments'}
+        </h3>
+        
+        {appointmentsLoading ? (
+          <div className="flex justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {appointments.slice(0, 10).map((appointment) => {
+              const typeConfig = getAppointmentTypeConfig(appointment.type);
+              const IconComponent = typeConfig.icon;
+              
+              return (
+                <div
+                  key={appointment.id}
+                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-start gap-3">
+                      <div className={`p-2 rounded-lg ${typeConfig.color}`}>
+                        <IconComponent className="h-4 w-4 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="font-medium">{appointment.title}</h4>
+                        <p className="text-sm text-gray-600">{appointment.description}</p>
+                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {new Date(appointment.scheduledAt).toLocaleString()}
+                          </span>
+                          {appointment.location && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3" />
+                              {appointment.location}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <Badge variant="outline" className="capitalize">
+                      {appointment.status}
+                    </Badge>
+                  </div>
+                </div>
+              );
+            })}
+            {appointments.length === 0 && (
+              <div className="text-center py-8 text-gray-500">
+                No appointments scheduled
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-// Embedded Inbox Component for Agent Portal
+// Full-Featured Inbox Component for Agent Portal
 function EmbeddedInbox() {
-  const { data: propertyInquiries = [] } = useQuery({
+  const [selectedTab, setSelectedTab] = useState('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedInquiry, setSelectedInquiry] = useState(null);
+  const [isReplyOpen, setIsReplyOpen] = useState(false);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const INQUIRY_TYPES = {
+    contact: { label: 'Contact Form', icon: Mail, color: 'bg-blue-500' },
+    property: { label: 'Property Inquiry', icon: Building, color: 'bg-green-500' },
+    booking: { label: 'Tour Booking', icon: Calendar, color: 'bg-purple-500' },
+    valuation: { label: 'Home Valuation', icon: DollarSign, color: 'bg-orange-500' },
+    consultation: { label: 'Consultation', icon: Users, color: 'bg-pink-500' }
+  };
+
+  const PRIORITY_COLORS = {
+    low: 'bg-gray-100 text-gray-800',
+    medium: 'bg-yellow-100 text-yellow-800',
+    high: 'bg-red-100 text-red-800',
+    urgent: 'bg-red-500 text-white'
+  };
+
+  // Fetch all inquiries and requests
+  const { data: propertyInquiries = [], isLoading: inquiriesLoading } = useQuery({
     queryKey: ['/api/property-inquiries'],
     staleTime: 60 * 1000,
+    refetchInterval: 2 * 60 * 1000,
   });
 
   const { data: homeValuations = [] } = useQuery({
     queryKey: ['/api/home-valuations'],
     staleTime: 60 * 1000,
+    refetchInterval: 2 * 60 * 1000,
   });
 
+  // Process and combine all requests
   const allRequests = useMemo(() => {
     const requests = [];
     
@@ -1516,12 +1809,17 @@ function EmbeddedInbox() {
       requests.push({
         id: inquiry.id,
         type: 'property',
+        category: 'property',
         title: `Property Inquiry - ${inquiry.propertyTitle || 'Unknown Property'}`,
         name: inquiry.name,
         email: inquiry.email,
+        phone: inquiry.phone,
+        message: inquiry.message,
         timestamp: inquiry.createdAt,
         status: inquiry.status || 'new',
-        priority: inquiry.priority || 'medium'
+        priority: inquiry.priority || 'medium',
+        propertyId: inquiry.propertyId,
+        leadId: inquiry.leadId
       });
     });
 
@@ -1529,60 +1827,434 @@ function EmbeddedInbox() {
       requests.push({
         id: valuation.id,
         type: 'valuation',
+        category: 'valuation',
         title: `Home Valuation - ${valuation.address}`,
         name: valuation.contactName,
         email: valuation.email,
+        phone: valuation.phone,
+        message: `Property valuation request for ${valuation.address}. Property details: ${valuation.propertyDetails}`,
         timestamp: valuation.createdAt,
         status: valuation.status || 'pending',
-        priority: 'high'
+        priority: 'high',
+        address: valuation.address,
+        estimatedValue: valuation.estimatedValue,
+        propertyDetails: valuation.propertyDetails
       });
     });
 
     return requests.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
   }, [propertyInquiries, homeValuations]);
 
+  // Filter requests based on selected tab and search term
+  const filteredRequests = useMemo(() => {
+    let filtered = allRequests;
+
+    if (selectedTab !== 'all') {
+      filtered = filtered.filter(request => request.category === selectedTab);
+    }
+
+    if (searchTerm) {
+      filtered = filtered.filter(request =>
+        request.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        request.message?.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    return filtered;
+  }, [allRequests, selectedTab, searchTerm]);
+
+  // Get request counts for tabs
+  const getRequestCount = (category: string) => {
+    if (category === 'all') return allRequests.length;
+    return allRequests.filter(r => r.category === category).length;
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'new': return 'bg-blue-100 text-blue-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'in_progress': return 'bg-purple-100 text-purple-800';
       case 'completed': return 'bg-green-100 text-green-800';
+      case 'closed': return 'bg-gray-100 text-gray-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
+  const getPriorityColor = (priority: string) => {
+    return PRIORITY_COLORS[priority] || PRIORITY_COLORS.medium;
+  };
+
+  const getTypeConfig = (type: string) => {
+    return INQUIRY_TYPES[type] || INQUIRY_TYPES.contact;
+  };
+
+  // Update inquiry status
+  const updateInquiryMutation = useMutation({
+    mutationFn: async ({ id, type, updates }: { id: number; type: string; updates: any }) => {
+      const endpoint = type === 'property' ? '/api/property-inquiries' : '/api/home-valuations';
+      const response = await apiRequest(`${endpoint}/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify(updates),
+      });
+      return response;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/property-inquiries'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/home-valuations'] });
+      toast({
+        title: "Success!",
+        description: "Request updated successfully",
+      });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to update request",
+        variant: "destructive",
+      });
+    },
+  });
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
+      {/* Header */}
       <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">Recent Requests</h3>
-        <Badge variant="secondary">{allRequests.length} total</Badge>
+        <div>
+          <h3 className="text-2xl font-bold">Customer Requests</h3>
+          <p className="text-gray-600 mt-1">Manage all customer inquiries and requests</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="secondary" className="text-sm">
+            {filteredRequests.length} requests
+          </Badge>
+          <Button size="sm" variant="outline">
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </div>
       </div>
 
-      <div className="space-y-3 max-h-[400px] overflow-auto">
-        {allRequests.slice(0, 10).map((request) => (
-          <div
-            key={`${request.type}-${request.id}`}
-            className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-          >
-            <div className="flex justify-between items-start mb-2">
-              <h4 className="font-medium text-sm">{request.title}</h4>
-              <Badge className={getStatusColor(request.status)}>
-                {request.status}
-              </Badge>
-            </div>
-            <p className="text-sm text-gray-600 mb-2">
-              From: {request.name} • {request.email}
-            </p>
-            <p className="text-xs text-gray-500">
-              {new Date(request.timestamp).toLocaleString()}
-            </p>
-          </div>
-        ))}
-        {allRequests.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No requests found
-          </div>
-        )}
+      {/* Search and Filter */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+          <Input
+            placeholder="Search requests by name, email, or message..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <div className="flex gap-2">
+          <Button size="sm" variant="outline" className="flex items-center gap-2">
+            <Filter className="h-4 w-4" />
+            Filter
+          </Button>
+        </div>
       </div>
+
+      {/* Tabs */}
+      <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-6">
+          <TabsTrigger value="all" className="flex items-center gap-2">
+            <InboxIcon className="h-4 w-4" />
+            All ({getRequestCount('all')})
+          </TabsTrigger>
+          <TabsTrigger value="property" className="flex items-center gap-2">
+            <Building className="h-4 w-4" />
+            Property ({getRequestCount('property')})
+          </TabsTrigger>
+          <TabsTrigger value="valuation" className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4" />
+            Valuations ({getRequestCount('valuation')})
+          </TabsTrigger>
+          <TabsTrigger value="booking" className="flex items-center gap-2">
+            <Calendar className="h-4 w-4" />
+            Bookings ({getRequestCount('booking')})
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value={selectedTab} className="space-y-4">
+          {inquiriesLoading ? (
+            <div className="flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredRequests.map((request) => {
+                const typeConfig = getTypeConfig(request.category);
+                const IconComponent = typeConfig.icon;
+                
+                return (
+                  <motion.div
+                    key={`${request.type}-${request.id}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="border rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+                  >
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-start gap-3">
+                        <div className={`p-2 rounded-lg ${typeConfig.color}`}>
+                          <IconComponent className="h-4 w-4 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h4 className="font-medium text-lg">{request.title}</h4>
+                          <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                            <span className="flex items-center gap-1">
+                              <User className="h-3 w-3" />
+                              {request.name}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Mail className="h-3 w-3" />
+                              {request.email}
+                            </span>
+                            {request.phone && (
+                              <span className="flex items-center gap-1">
+                                <Phone className="h-3 w-3" />
+                                {request.phone}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getPriorityColor(request.priority)}>
+                          {request.priority}
+                        </Badge>
+                        <Badge className={getStatusColor(request.status)}>
+                          {request.status}
+                        </Badge>
+                      </div>
+                    </div>
+
+                    <div className="mb-3">
+                      <p className="text-gray-700 line-clamp-2">{request.message}</p>
+                      {request.type === 'valuation' && request.estimatedValue && (
+                        <p className="text-sm text-green-600 mt-1">
+                          Estimated Value: ${request.estimatedValue.toLocaleString()}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-1 text-sm text-gray-500">
+                        <Clock className="h-3 w-3" />
+                        {new Date(request.timestamp).toLocaleString()}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedInquiry(request)}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setIsReplyOpen(true)}
+                        >
+                          <Reply className="h-4 w-4 mr-1" />
+                          Reply
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => updateInquiryMutation.mutate({
+                            id: request.id,
+                            type: request.type,
+                            updates: { status: 'completed' }
+                          })}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Mark Done
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                );
+              })}
+              
+              {filteredRequests.length === 0 && (
+                <div className="text-center py-12">
+                  <InboxIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                    {searchTerm ? 'No matching requests' : 'No requests found'}
+                  </h3>
+                  <p className="text-gray-500">
+                    {searchTerm ? 'Try adjusting your search terms' : 'New customer requests will appear here'}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+
+      {/* Reply Dialog */}
+      <Dialog open={isReplyOpen} onOpenChange={setIsReplyOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Reply to Request</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="reply-message">Message</Label>
+              <Textarea
+                id="reply-message"
+                placeholder="Type your reply..."
+                className="mt-1"
+                rows={6}
+              />
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setIsReplyOpen(false)}>
+                Cancel
+              </Button>
+              <Button className="bg-blue-600 hover:bg-blue-700">
+                Send Reply
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Appointment Form Component
+function AppointmentForm({ onSubmit, leads, properties, selectedDate, appointmentTypes }) {
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    type: 'client_meeting',
+    scheduledAt: selectedDate ? selectedDate.toISOString().slice(0, 16) : '',
+    location: '',
+    leadId: '',
+    propertyId: '',
+    status: 'scheduled'
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSubmit({
+      ...formData,
+      scheduledAt: new Date(formData.scheduledAt).toISOString(),
+      leadId: formData.leadId ? parseInt(formData.leadId) : null,
+      propertyId: formData.propertyId ? parseInt(formData.propertyId) : null,
+    });
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="title">Title</Label>
+          <Input
+            id="title"
+            value={formData.title}
+            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            placeholder="Appointment title"
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="type">Type</Label>
+          <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {appointmentTypes.map(type => (
+                <SelectItem key={type.value} value={type.value}>
+                  {type.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+          placeholder="Appointment details"
+          rows={3}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="scheduledAt">Date & Time</Label>
+          <Input
+            id="scheduledAt"
+            type="datetime-local"
+            value={formData.scheduledAt}
+            onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}
+            required
+          />
+        </div>
+        <div>
+          <Label htmlFor="location">Location</Label>
+          <Input
+            id="location"
+            value={formData.location}
+            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+            placeholder="Meeting location"
+          />
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="leadId">Lead (Optional)</Label>
+          <Select value={formData.leadId} onValueChange={(value) => setFormData({ ...formData, leadId: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select lead" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">No lead</SelectItem>
+              {leads.map(lead => (
+                <SelectItem key={lead.id} value={lead.id.toString()}>
+                  {lead.firstName} {lead.lastName}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor="propertyId">Property (Optional)</Label>
+          <Select value={formData.propertyId} onValueChange={(value) => setFormData({ ...formData, propertyId: value })}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select property" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">No property</SelectItem>
+              {properties.map(property => (
+                <SelectItem key={property.id} value={property.id.toString()}>
+                  {property.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="flex justify-end gap-2 pt-4">
+        <Button type="button" variant="outline">
+          Cancel
+        </Button>
+        <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
+          <Plus className="h-4 w-4 mr-2" />
+          Create Appointment
+        </Button>
+      </div>
+    </form>
   );
 }
