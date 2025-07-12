@@ -707,61 +707,485 @@ export default function AgentPortalPage() {
               </Card>
             </TabsContent>
 
-            {/* Placeholder tabs for completeness */}
-            <TabsContent value="appointments">
+            {/* Appointments Section */}
+            <TabsContent value="appointments" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Appointment Scheduling</h2>
+                <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  Schedule New Appointment
+                </Button>
+              </div>
+
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle>Calendar & Appointments</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-blue-600" />
+                    Upcoming Appointments
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Advanced calendar integration coming soon</p>
-                  </div>
+                  {appointmentsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
+                  ) : appointments.length === 0 ? (
+                    <div className="text-center py-12">
+                      <Calendar className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-700 mb-2">No appointments scheduled</h3>
+                      <p className="text-gray-500 mb-6">Start scheduling meetings with your leads and clients</p>
+                      <Button className="bg-gradient-to-r from-blue-600 to-purple-600">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Schedule First Appointment
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {appointments.map((appointment, index) => (
+                        <div key={index} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="font-semibold text-lg">{appointment.title}</h3>
+                              <p className="text-gray-600">{appointment.type}</p>
+                              <div className="flex items-center gap-4 text-sm text-gray-600 mt-2">
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-4 w-4" />
+                                  {formatDate(appointment.scheduledAt)}
+                                </span>
+                                {appointment.location && (
+                                  <span className="flex items-center gap-1">
+                                    <MapPin className="h-4 w-4" />
+                                    {appointment.location}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Badge className={getStatusColor(appointment.status)}>
+                                {appointment.status}
+                              </Badge>
+                              <Button size="sm" variant="outline">
+                                <Edit className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="contracts">
+            {/* Contracts Section */}
+            <TabsContent value="contracts" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Deal Management</h2>
+                <Button className="bg-gradient-to-r from-green-600 to-blue-600">
+                  <FileText className="h-4 w-4 mr-2" />
+                  Create New Contract
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <Card className="border-l-4 border-l-green-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Active Deals</p>
+                        <p className="text-3xl font-bold text-green-600">{metrics.activeContracts}</p>
+                      </div>
+                      <FileText className="h-8 w-8 text-green-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Pipeline Value</p>
+                        <p className="text-3xl font-bold text-blue-600">
+                          {formatCurrency(contracts.reduce((sum, c) => sum + c.contractAmount, 0))}
+                        </p>
+                      </div>
+                      <DollarSign className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-purple-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Avg Deal Size</p>
+                        <p className="text-3xl font-bold text-purple-600">{formatCurrency(metrics.avgDealSize)}</p>
+                      </div>
+                      <TrendingUp className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle>Deal Management</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-green-600" />
+                    Contract Pipeline
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Contract management system being built</p>
-                  </div>
+                  {contractsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                    </div>
+                  ) : contracts.length === 0 ? (
+                    <div className="text-center py-12">
+                      <FileText className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-700 mb-2">No contracts yet</h3>
+                      <p className="text-gray-500 mb-6">Start converting your leads into deals</p>
+                      <Button className="bg-gradient-to-r from-green-600 to-blue-600">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create First Contract
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {contracts.map((contract, index) => (
+                        <div key={index} className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-gradient-to-r from-white to-green-50/30">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="font-bold text-xl">{contract.type} Contract</h3>
+                                <Badge className={getStatusColor(contract.status) + ' border'}>
+                                  {contract.status}
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <span className="flex items-center gap-2">
+                                  <Building className="h-4 w-4 text-blue-500" />
+                                  Property #{contract.propertyId}
+                                </span>
+                                <span className="flex items-center gap-2 font-semibold text-green-600">
+                                  <DollarSign className="h-4 w-4" />
+                                  {formatCurrency(contract.contractAmount)}
+                                </span>
+                                <span className="flex items-center gap-2">
+                                  <Users className="h-4 w-4 text-purple-500" />
+                                  Agent #{contract.agentId}
+                                </span>
+                                <span className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-gray-400" />
+                                  {formatDate(contract.createdAt)}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button size="sm" variant="outline" className="hover:bg-blue-50">
+                                <Eye className="h-4 w-4 mr-1" />
+                                View
+                              </Button>
+                              <Button size="sm" variant="outline" className="hover:bg-green-50">
+                                <Edit className="h-4 w-4 mr-1" />
+                                Edit
+                              </Button>
+                              <Button size="sm" className="bg-gradient-to-r from-green-500 to-blue-600">
+                                <CheckCircle className="h-4 w-4 mr-1" />
+                                Update
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="commissions">
+            {/* Commissions Section */}
+            <TabsContent value="commissions" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Revenue & Commission Tracking</h2>
+                <Button className="bg-gradient-to-r from-yellow-600 to-orange-600">
+                  <DollarSign className="h-4 w-4 mr-2" />
+                  Add Commission
+                </Button>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <Card className="border-l-4 border-l-green-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Total Earned</p>
+                        <p className="text-3xl font-bold text-green-600">{formatCurrency(metrics.totalCommissionAmount)}</p>
+                      </div>
+                      <DollarSign className="h-8 w-8 text-green-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Pending Commissions</p>
+                        <p className="text-3xl font-bold text-blue-600">
+                          {formatCurrency(commissions.filter(c => c.status === 'pending').reduce((sum, c) => sum + (c.netCommission || 0), 0))}
+                        </p>
+                      </div>
+                      <Clock className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-purple-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Avg Commission</p>
+                        <p className="text-3xl font-bold text-purple-600">
+                          {formatCurrency(commissions.length > 0 ? metrics.totalCommissionAmount / commissions.length : 0)}
+                        </p>
+                      </div>
+                      <BarChart3 className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-orange-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Commission Rate</p>
+                        <p className="text-3xl font-bold text-orange-600">
+                          {commissions.length > 0 ? Math.round(commissions.reduce((sum, c) => sum + c.commissionRate, 0) / commissions.length * 10) / 10 : 0}%
+                        </p>
+                      </div>
+                      <Target className="h-8 w-8 text-orange-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle>Revenue & Commission Tracking</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="h-5 w-5 text-green-600" />
+                    Commission History
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-12">
-                    <DollarSign className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Revenue analytics dashboard in development</p>
-                  </div>
+                  {commissionsLoading ? (
+                    <div className="flex items-center justify-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+                    </div>
+                  ) : commissions.length === 0 ? (
+                    <div className="text-center py-12">
+                      <DollarSign className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-gray-700 mb-2">No commissions yet</h3>
+                      <p className="text-gray-500 mb-6">Close your first deal to start earning commissions</p>
+                      <Button className="bg-gradient-to-r from-yellow-600 to-orange-600">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Record Commission
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {commissions.map((commission, index) => (
+                        <div key={index} className="border rounded-lg p-6 hover:shadow-md transition-shadow bg-gradient-to-r from-white to-yellow-50/30">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <h3 className="font-bold text-xl">Sale Commission</h3>
+                                <Badge className={getStatusColor(commission.status) + ' border'}>
+                                  {commission.status}
+                                </Badge>
+                              </div>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                <span className="flex items-center gap-2 font-semibold text-green-600">
+                                  <DollarSign className="h-4 w-4" />
+                                  Sale: {formatCurrency(commission.salePrice)}
+                                </span>
+                                <span className="flex items-center gap-2">
+                                  <Target className="h-4 w-4 text-blue-500" />
+                                  Rate: {commission.commissionRate}%
+                                </span>
+                                <span className="flex items-center gap-2 font-bold text-green-600">
+                                  <Award className="h-4 w-4" />
+                                  Net: {formatCurrency(commission.netCommission)}
+                                </span>
+                                <span className="flex items-center gap-2">
+                                  <Clock className="h-4 w-4 text-gray-400" />
+                                  {formatDate(commission.createdAt)}
+                                </span>
+                              </div>
+                              {commission.brokerageSplit && (
+                                <div className="mt-2 text-sm text-gray-600">
+                                  Brokerage Split: {commission.brokerageSplit}%
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Button size="sm" variant="outline" className="hover:bg-blue-50">
+                                <Eye className="h-4 w-4 mr-1" />
+                                Details
+                              </Button>
+                              <Button size="sm" className="bg-gradient-to-r from-yellow-500 to-orange-600">
+                                <Download className="h-4 w-4 mr-1" />
+                                Invoice
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </TabsContent>
 
-            <TabsContent value="analytics">
-              <Card className="shadow-lg">
-                <CardHeader>
-                  <CardTitle>Performance Analytics</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-12">
-                    <BarChart3 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-500">Advanced analytics suite coming soon</p>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Analytics Section */}
+            <TabsContent value="analytics" className="space-y-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-2xl font-bold">Performance Analytics</h2>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm">
+                    <Download className="h-4 w-4 mr-2" />
+                    Export Report
+                  </Button>
+                  <Button className="bg-gradient-to-r from-purple-600 to-blue-600">
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    Generate Report
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card className="border-l-4 border-l-blue-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Lead Conversion</p>
+                        <p className="text-3xl font-bold text-blue-600">{metrics.conversionRate}%</p>
+                        <p className="text-xs text-green-600 mt-1">Industry avg: 2-5%</p>
+                      </div>
+                      <TrendingUp className="h-8 w-8 text-blue-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-green-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Active Pipeline</p>
+                        <p className="text-3xl font-bold text-green-600">{metrics.activeLeads}</p>
+                        <p className="text-xs text-gray-500 mt-1">Hot prospects</p>
+                      </div>
+                      <Users className="h-8 w-8 text-green-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-purple-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Revenue Per Lead</p>
+                        <p className="text-3xl font-bold text-purple-600">
+                          {formatCurrency(metrics.totalLeads > 0 ? metrics.totalCommissionAmount / metrics.totalLeads : 0)}
+                        </p>
+                        <p className="text-xs text-gray-500 mt-1">Average value</p>
+                      </div>
+                      <DollarSign className="h-8 w-8 text-purple-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="border-l-4 border-l-orange-500">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-600">Weekly Growth</p>
+                        <p className="text-3xl font-bold text-orange-600">+{metrics.newLeadsThisWeek}</p>
+                        <p className="text-xs text-green-600 mt-1">New leads</p>
+                      </div>
+                      <ArrowUpRight className="h-8 w-8 text-orange-600" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5 text-blue-600" />
+                      Lead Status Breakdown
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {['new', 'active', 'converted', 'closed'].map((status) => {
+                        const count = leads.filter(l => l.status === status).length;
+                        const percentage = metrics.totalLeads > 0 ? Math.round((count / metrics.totalLeads) * 100) : 0;
+                        return (
+                          <div key={status} className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <Badge className={getStatusColor(status)}>{status}</Badge>
+                              <span className="text-sm text-gray-600">{count} leads</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <div className="w-24 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-blue-600 h-2 rounded-full" 
+                                  style={{ width: `${percentage}%` }}
+                                ></div>
+                              </div>
+                              <span className="text-sm font-medium">{percentage}%</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="shadow-lg">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Target className="h-5 w-5 text-green-600" />
+                      Performance Metrics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Lead Response Rate</span>
+                        <span className="font-semibold">95%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Average Deal Cycle</span>
+                        <span className="font-semibold">45 days</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Client Satisfaction</span>
+                        <span className="font-semibold">4.9/5.0</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Referral Rate</span>
+                        <span className="font-semibold">32%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-gray-600">Market Share</span>
+                        <span className="font-semibold">8.2%</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </motion.div>
