@@ -9,6 +9,8 @@ import {
   contracts,
   commissions,
   marketingCampaigns,
+  homeValuations,
+  marketPredictions,
   type Property, 
   type InsertProperty,
   type Neighborhood,
@@ -28,7 +30,11 @@ import {
   type Commission,
   type InsertCommission,
   type MarketingCampaign,
-  type InsertMarketingCampaign
+  type InsertMarketingCampaign,
+  type HomeValuation,
+  type InsertHomeValuation,
+  type MarketPrediction,
+  type InsertMarketPrediction
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, desc, asc, sql, between, ilike } from "drizzle-orm";
@@ -135,6 +141,17 @@ export interface IStorage {
   // Search
   searchProperties(query: string): Promise<Property[]>;
   searchLeads(query: string): Promise<Lead[]>;
+  
+  // Home Valuations
+  createHomeValuation(valuation: InsertHomeValuation): Promise<HomeValuation>;
+  getHomeValuation(id: number): Promise<HomeValuation | undefined>;
+  getHomeValuations(leadId?: number): Promise<HomeValuation[]>;
+  updateHomeValuation(id: number, valuation: Partial<InsertHomeValuation>): Promise<HomeValuation>;
+  
+  // Market Predictions  
+  createMarketPrediction(prediction: InsertMarketPrediction): Promise<MarketPrediction>;
+  getMarketPrediction(id: number): Promise<MarketPrediction | undefined>;
+  getMarketPredictions(propertyId?: number): Promise<MarketPrediction[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -572,6 +589,50 @@ export class DatabaseStorage implements IStorage {
       )
       .orderBy(desc(leads.priority), desc(leads.createdAt))
       .limit(20);
+  }
+  // Home Valuations
+  async createHomeValuation(valuation: InsertHomeValuation): Promise<HomeValuation> {
+    const [result] = await db.insert(homeValuations).values(valuation).returning();
+    return result;
+  }
+
+  async getHomeValuation(id: number): Promise<HomeValuation | undefined> {
+    const [result] = await db.select().from(homeValuations).where(eq(homeValuations.id, id));
+    return result;
+  }
+
+  async getHomeValuations(leadId?: number): Promise<HomeValuation[]> {
+    if (leadId) {
+      return await db.select().from(homeValuations).where(eq(homeValuations.leadId, leadId));
+    }
+    return await db.select().from(homeValuations).orderBy(desc(homeValuations.createdAt));
+  }
+
+  async updateHomeValuation(id: number, valuation: Partial<InsertHomeValuation>): Promise<HomeValuation> {
+    const [result] = await db
+      .update(homeValuations)
+      .set({ ...valuation, updatedAt: new Date() })
+      .where(eq(homeValuations.id, id))
+      .returning();
+    return result;
+  }
+
+  // Market Predictions
+  async createMarketPrediction(prediction: InsertMarketPrediction): Promise<MarketPrediction> {
+    const [result] = await db.insert(marketPredictions).values(prediction).returning();
+    return result;
+  }
+
+  async getMarketPrediction(id: number): Promise<MarketPrediction | undefined> {
+    const [result] = await db.select().from(marketPredictions).where(eq(marketPredictions.id, id));
+    return result;
+  }
+
+  async getMarketPredictions(propertyId?: number): Promise<MarketPrediction[]> {
+    if (propertyId) {
+      return await db.select().from(marketPredictions).where(eq(marketPredictions.propertyId, propertyId));
+    }
+    return await db.select().from(marketPredictions).orderBy(desc(marketPredictions.createdAt));
   }
 }
 

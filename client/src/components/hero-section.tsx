@@ -8,8 +8,8 @@ export default function HeroSection() {
       {/* Background */}
       <div className="absolute inset-0">
         <img 
-          src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2071&h=1380" 
-          alt="Stunning aerial view of Diamond Head crater and Waikiki Beach, Hawaii with luxury oceanfront properties"
+          src="@assets/aerial-view2-768x537_1752329318459.jpg"
+          alt="Stunning aerial view of Honolulu and Diamond Head crater with luxury oceanfront properties"
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-background/20" />

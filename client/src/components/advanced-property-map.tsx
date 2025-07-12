@@ -32,157 +32,7 @@ import {
   Search
 } from "lucide-react";
 
-// Elite Hawaiian properties with comprehensive data
-const eliteHawaiiProperties = [
-  {
-    id: 1,
-    price: 12800000,
-    priceFormatted: "$12.8M",
-    title: "Diamond Head Oceanfront Masterpiece",
-    beds: 7,
-    baths: 8,
-    sqft: 8500,
-    lat: 21.2619,
-    lng: -157.8063,
-    address: "240 Portlock Road, Honolulu, HI 96825",
-    neighborhood: "Diamond Head",
-    island: "Oahu",
-    propertyType: "Estate",
-    yearBuilt: 2021,
-    lotSize: 1.2,
-    oceanfront: true,
-    poolType: "Infinity",
-    views: ["Ocean", "Diamond Head", "Sunrise"],
-    amenities: ["Private Beach", "Wine Cellar", "Home Theater", "Gym", "Chef's Kitchen"],
-    lifestyle: {
-      privacy: 10,
-      luxury: 10,
-      beachAccess: 10,
-      nightlife: 8,
-      shopping: 9,
-      schools: 9
-    },
-    investment: {
-      appreciation: 8.5,
-      rental: 180000,
-      capRate: 1.4
-    },
-    image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-    virtualTour: true,
-    status: "Active"
-  },
-  {
-    id: 2,
-    price: 15200000,
-    priceFormatted: "$15.2M",
-    title: "Wailea Resort Estate",
-    beds: 8,
-    baths: 10,
-    sqft: 12000,
-    lat: 20.6888,
-    lng: -156.4419,
-    address: "3550 Wailea Alanui Drive, Wailea, HI 96753",
-    neighborhood: "Wailea",
-    island: "Maui",
-    propertyType: "Resort Villa",
-    yearBuilt: 2020,
-    lotSize: 2.1,
-    oceanfront: true,
-    poolType: "Resort Style",
-    views: ["Ocean", "Haleakala", "Sunset"],
-    amenities: ["Guest Casita", "Tennis Court", "Spa", "Art Studio", "Meditation Garden"],
-    lifestyle: {
-      privacy: 9,
-      luxury: 10,
-      beachAccess: 10,
-      nightlife: 6,
-      shopping: 8,
-      schools: 7
-    },
-    investment: {
-      appreciation: 9.2,
-      rental: 220000,
-      capRate: 1.4
-    },
-    image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-    virtualTour: true,
-    status: "Active"
-  },
-  {
-    id: 3,
-    price: 22500000,
-    priceFormatted: "$22.5M",
-    title: "Kona Coffee & Volcano Estate",
-    beds: 9,
-    baths: 12,
-    sqft: 15000,
-    lat: 19.6394,
-    lng: -155.9969,
-    address: "75-5919 Alii Drive, Kailua-Kona, HI 96740",
-    neighborhood: "Kona",
-    island: "Big Island",
-    propertyType: "Agricultural Estate",
-    yearBuilt: 2019,
-    lotSize: 50.5,
-    oceanfront: true,
-    poolType: "Natural Rock",
-    views: ["Ocean", "Volcano", "Coffee Plantation"],
-    amenities: ["Coffee Farm", "Helipad", "Observatory", "Organic Gardens", "Staff Quarters"],
-    lifestyle: {
-      privacy: 10,
-      luxury: 10,
-      beachAccess: 8,
-      nightlife: 4,
-      shopping: 6,
-      schools: 6
-    },
-    investment: {
-      appreciation: 11.8,
-      rental: 350000,
-      capRate: 1.6
-    },
-    image: "https://images.unsplash.com/photo-1609766857041-ed402ea8069a?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-    virtualTour: true,
-    status: "Active"
-  },
-  {
-    id: 4,
-    price: 18900000,
-    priceFormatted: "$18.9M",
-    title: "Princeville Resort Sanctuary",
-    beds: 6,
-    baths: 7,
-    sqft: 9200,
-    lat: 22.2160,
-    lng: -159.4845,
-    address: "5300 Ka Haku Road, Princeville, HI 96722",
-    neighborhood: "Princeville",
-    island: "Kauai",
-    propertyType: "Resort Estate",
-    yearBuilt: 2022,
-    lotSize: 3.8,
-    oceanfront: true,
-    poolType: "Infinity with Spa",
-    views: ["Ocean", "Napali Coast", "Mountains"],
-    amenities: ["Private Golf Access", "Waterfall", "Japanese Garden", "Art Gallery", "Wine Cave"],
-    lifestyle: {
-      privacy: 10,
-      luxury: 10,
-      beachAccess: 9,
-      nightlife: 3,
-      shopping: 5,
-      schools: 7
-    },
-    investment: {
-      appreciation: 10.1,
-      rental: 280000,
-      capRate: 1.5
-    },
-    image: "https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=300",
-    virtualTour: true,
-    status: "Coming Soon"
-  }
-];
+// Use only authentic MLS data from database
 
 const mapOverlays = [
   { id: "lifestyle", label: "Lifestyle Score", icon: Heart, color: "bg-pink-500" },
@@ -194,16 +44,28 @@ const mapOverlays = [
 ];
 
 export default function AdvancedPropertyMap() {
-  const [selectedProperty, setSelectedProperty] = useState<number | null>(1);
-  const [activeOverlays, setActiveOverlays] = useState<string[]>(["lifestyle"]);
-  const [priceRange, setPriceRange] = useState([10000000, 25000000]);
-  const [selectedIsland, setSelectedIsland] = useState("all");
+  const [selectedProperty, setSelectedProperty] = useState<number | null>(null);
+  const [activeOverlays, setActiveOverlays] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState([3000000, 10000000]);
+  const [selectedCity, setSelectedCity] = useState("all");
   const [propertyType, setPropertyType] = useState("all");
-  const [showInvestmentData, setShowInvestmentData] = useState(true);
-  const [showLifestyleScores, setShowLifestyleScores] = useState(true);
-  const [mapView, setMapView] = useState<"satellite" | "terrain" | "luxury">("luxury");
+  const [showInvestmentData, setShowInvestmentData] = useState(false);
+  const [showLifestyleScores, setShowLifestyleScores] = useState(false);
+  const [mapView, setMapView] = useState<"satellite" | "terrain" | "hybrid">("hybrid");
   const [showParcelData, setShowParcelData] = useState(false);
+  const [userPreferences, setUserPreferences] = useState<any>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
+
+  // Fetch authentic Hawaii MLS properties from database
+  const { data: properties, isLoading: propertiesLoading } = useQuery({
+    queryKey: ["/api/properties", { 
+      minPrice: priceRange[0], 
+      maxPrice: priceRange[1],
+      city: selectedCity !== "all" ? selectedCity : undefined,
+      propertyType: propertyType !== "all" ? propertyType : undefined,
+      limit: 50
+    }],
+  });
 
   // Fetch real Hawaii State parcel data for luxury properties
   const { data: hawaiiParcels, isLoading: parcelsLoading } = useQuery({
@@ -211,14 +73,8 @@ export default function AdvancedPropertyMap() {
     enabled: showParcelData
   });
 
-  const filteredProperties = eliteHawaiiProperties.filter(property => {
-    const matchesPrice = property.price >= priceRange[0] && property.price <= priceRange[1];
-    const matchesIsland = selectedIsland === "all" || property.island.toLowerCase().replace(" ", "-") === selectedIsland;
-    const matchesType = propertyType === "all" || property.propertyType.toLowerCase().includes(propertyType);
-    return matchesPrice && matchesIsland && matchesType;
-  });
-
-  const selectedPropertyData = filteredProperties.find(p => p.id === selectedProperty);
+  const filteredProperties = properties || [];
+  const selectedPropertyData = filteredProperties.find((p: any) => p.id === selectedProperty);
 
   const toggleOverlay = (overlayId: string) => {
     setActiveOverlays(prev => 
@@ -396,9 +252,9 @@ export default function AdvancedPropertyMap() {
             <div className="absolute inset-0 bg-gradient-to-r from-purple-900/40 via-blue-900/40 to-teal-900/40" />
           )}
 
-          {/* Property Markers */}
+          {/* Property Markers - Only show if properties exist */}
           <AnimatePresence>
-            {filteredProperties.map((property, index) => (
+            {filteredProperties.map((property: any, index: number) => (
               <motion.div
                 key={property.id}
                 initial={{ scale: 0, opacity: 0 }}
@@ -407,16 +263,18 @@ export default function AdvancedPropertyMap() {
                 transition={{ duration: 0.3, delay: index * 0.1 }}
                 className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer z-10"
                 style={{
-                  left: `${25 + (property.lng + 160) * 1.8}%`,
-                  top: `${20 + (22.5 - property.lat) * 15}%`
+                  left: `${30 + index * 15}%`,
+                  top: `${40 + (index % 3) * 20}%`
                 }}
                 onClick={() => setSelectedProperty(property.id)}
               >
                 <div className="relative group">
                   <div 
                     className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white shadow-lg ${
-                      getPropertyMarkerStyle(property, selectedProperty === property.id)
-                    }`}
+                      selectedProperty === property.id 
+                        ? 'bg-blue-600 scale-110' 
+                        : 'bg-blue-500 hover:bg-blue-600'
+                    } transition-all duration-200`}
                   >
                     <DollarSign className="w-5 h-5" />
                   </div>
@@ -424,27 +282,34 @@ export default function AdvancedPropertyMap() {
                   {/* Quick Preview on Hover */}
                   <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
                     <div className="bg-black/90 text-white text-xs p-2 rounded-lg whitespace-nowrap">
-                      <div className="font-semibold">{property.priceFormatted}</div>
-                      <div>{property.beds}bd • {property.baths}ba</div>
+                      <div className="font-semibold">${property.price?.toLocaleString()}</div>
+                      <div>{property.bedrooms}bd • {property.bathrooms}ba</div>
                     </div>
                   </div>
-
-                  {/* Overlay Indicators */}
-                  {activeOverlays.includes("investment") && (
-                    <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
-                      <TrendingUp className="w-2 h-2 text-white" />
-                    </div>
-                  )}
-                  
-                  {activeOverlays.includes("lifestyle") && property.lifestyle.luxury >= 9 && (
-                    <div className="absolute -top-1 -left-1 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center">
-                      <Heart className="w-2 h-2 text-white" />
-                    </div>
-                  )}
                 </div>
               </motion.div>
             ))}
           </AnimatePresence>
+          
+          {/* No Properties Message */}
+          {!propertiesLoading && filteredProperties.length === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Card className="p-6 text-center bg-white/90 backdrop-blur">
+                <p className="text-gray-600 mb-4">No properties found matching your criteria</p>
+                <p className="text-sm text-gray-500">Try adjusting your filters or price range</p>
+              </Card>
+            </div>
+          )}
+          
+          {/* Loading State */}
+          {propertiesLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Card className="p-6 text-center bg-white/90 backdrop-blur">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                <p className="text-gray-600">Loading authentic Hawaii MLS properties...</p>
+              </Card>
+            </div>
+          )}
 
           {/* Property Details Panel */}
           <AnimatePresence>

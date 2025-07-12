@@ -248,6 +248,87 @@ export const chatConversations = pgTable("chat_conversations", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Market Value Predictions table
+export const marketPredictions = pgTable("market_predictions", {
+  id: serial("id").primaryKey(),
+  propertyId: integer("property_id").references(() => properties.id),
+  address: text("address").notNull(),
+  predictedValue: decimal("predicted_value", { precision: 12, scale: 2 }).notNull(),
+  currentMarketValue: decimal("current_market_value", { precision: 12, scale: 2 }).notNull(),
+  confidenceScore: decimal("confidence_score", { precision: 3, scale: 2 }).notNull(), // 0.00 to 1.00
+  factors: json("factors").$type<{
+    comparableProperties: Array<{
+      mlsNumber: string;
+      price: number;
+      pricePerSqFt: number;
+      distance: number;
+      similarity: number;
+    }>;
+    marketTrends: {
+      priceAppreciation: number;
+      daysOnMarket: number;
+      demandIndex: number;
+    };
+    propertyFeatures: {
+      locationScore: number;
+      conditionScore: number;
+      amenityScore: number;
+      viewScore: number;
+    };
+    adjustments: Array<{
+      factor: string;
+      adjustment: number;
+      reason: string;
+    }>;
+  }>().notNull(),
+  methodology: text("methodology").notNull(),
+  predictions: json("predictions").$type<{
+    sixMonths: number;
+    oneYear: number;
+    threeYears: number;
+    fiveYears: number;
+  }>().notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Home Valuation Requests table
+export const homeValuations = pgTable("home_valuations", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id").references(() => leads.id),
+  address: text("address").notNull(),
+  city: text("city").notNull(),
+  zipCode: text("zip_code").notNull(),
+  propertyType: text("property_type").notNull(),
+  squareFeet: integer("square_feet"),
+  bedrooms: integer("bedrooms"),
+  bathrooms: decimal("bathrooms", { precision: 3, scale: 1 }),
+  yearBuilt: integer("year_built"),
+  lotSize: decimal("lot_size", { precision: 8, scale: 2 }),
+  condition: text("condition"), // 'excellent', 'good', 'fair', 'poor'
+  upgrades: json("upgrades").$type<string[]>().default([]),
+  amenities: json("amenities").$type<string[]>().default([]),
+  estimatedValue: decimal("estimated_value", { precision: 12, scale: 2 }),
+  valueRange: json("value_range").$type<{
+    low: number;
+    high: number;
+  }>(),
+  marketAnalysis: json("market_analysis").$type<{
+    comparables: Array<{
+      address: string;
+      price: number;
+      squareFeet: number;
+      pricePerSqFt: number;
+      distance: number;
+    }>;
+    marketConditions: string;
+    recommendedListPrice: number;
+    timeToSell: string;
+  }>(),
+  status: text("status").default("pending"), // 'pending', 'completed', 'scheduled_visit'
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // ADVANCED RELATIONS - Enterprise-grade data relationships
 export const propertiesRelations = relations(properties, ({ many }) => ({
   inquiries: many(propertyInquiries),
@@ -407,6 +488,17 @@ export const insertMarketingCampaignSchema = createInsertSchema(marketingCampaig
   updatedAt: true,
 });
 
+export const insertHomeValuationSchema = createInsertSchema(homeValuations).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertMarketPredictionSchema = createInsertSchema(marketPredictions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // COMPREHENSIVE TYPE DEFINITIONS
 export type Property = typeof properties.$inferSelect;
 export type InsertProperty = z.infer<typeof insertPropertySchema>;
@@ -437,3 +529,9 @@ export type InsertCommission = z.infer<typeof insertCommissionSchema>;
 
 export type MarketingCampaign = typeof marketingCampaigns.$inferSelect;
 export type InsertMarketingCampaign = z.infer<typeof insertMarketingCampaignSchema>;
+
+export type HomeValuation = typeof homeValuations.$inferSelect;
+export type InsertHomeValuation = z.infer<typeof insertHomeValuationSchema>;
+
+export type MarketPrediction = typeof marketPredictions.$inferSelect;
+export type InsertMarketPrediction = z.infer<typeof insertMarketPredictionSchema>;

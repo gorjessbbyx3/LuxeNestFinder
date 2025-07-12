@@ -9,6 +9,7 @@ import Properties from "@/pages/properties";
 import PropertyDetail from "@/pages/property-detail";
 import VirtualTours from "@/pages/virtual-tours";
 import Neighborhoods from "@/pages/neighborhoods";
+import SellYourHome from "@/pages/sell-your-home";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -19,6 +20,7 @@ function Router() {
       <Route path="/properties/:id" component={PropertyDetail} />
       <Route path="/virtual-tours" component={VirtualTours} />
       <Route path="/neighborhoods" component={Neighborhoods} />
+      <Route path="/sell-your-home" component={SellYourHome} />
       <Route component={NotFound} />
     </Switch>
   );

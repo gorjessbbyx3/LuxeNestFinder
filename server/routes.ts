@@ -9,12 +9,14 @@ import {
   insertAppointmentSchema,
   insertContractSchema,
   insertCommissionSchema,
-  insertMarketingCampaignSchema
+  insertMarketingCampaignSchema,
+  insertHomeValuationSchema
 } from "@shared/schema";
 import { generatePropertyDescription } from "./lib/openai";
 import { hawaiiParcelService } from "./lib/hawaii-parcels";
 import { hiCentralMLSService } from "./lib/hicentral-mls";
 import { mlsScraperService } from "./lib/mls-scraper";
+import { marketValuePredictor } from "./lib/market-value-predictor";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -674,6 +676,105 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // HOME VALUATION ENDPOINTS - Real-time market value calculator
+  app.post("/api/home-valuation", async (req, res) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        email,
+        phone,
+        address,
+        city,
+        zipCode = "96815",
+        propertyType,
+        squareFeet,
+        bedrooms,
+        bathrooms,
+        yearBuilt,
+        lotSize,
+        condition,
+        amenities = [],
+        upgrades = []
+      } = req.body;
+
+      // Validate required fields
+      if (!firstName || !lastName || !email || !address || !city || !squareFeet || !bedrooms || !bathrooms || !propertyType || !condition) {
+        return res.status(400).json({ 
+          message: "Missing required fields for home valuation" 
+        });
+      }
+
+      // Calculate market valuation using authentic Hawaii MLS data
+      const propertyDetails = {
+        address,
+        city,
+        zipCode,
+        squareFeet: parseInt(squareFeet),
+        bedrooms: parseInt(bedrooms),
+        bathrooms: parseFloat(bathrooms),
+        yearBuilt: yearBuilt ? parseInt(yearBuilt) : undefined,
+        propertyType,
+        condition,
+        lotSize: lotSize ? parseFloat(lotSize) : undefined,
+        amenities,
+        upgrades
+      };
+
+      const marketValuation = await marketValuePredictor.calculateMarketValue(propertyDetails);
+
+      // Save to CRM
+      const { leadId, valuationId } = await marketValuePredictor.saveHomeValuationRequest({
+        firstName,
+        lastName,
+        email,
+        phone,
+        ...propertyDetails
+      }, marketValuation);
+
+      res.json({
+        success: true,
+        valuation: marketValuation,
+        leadId,
+        valuationId,
+        message: "Market valuation completed using authentic Hawaii MLS data"
+      });
+
+    } catch (error) {
+      console.error("Error calculating home valuation:", error);
+      res.status(500).json({ 
+        message: "Failed to calculate home valuation",
+        error: error.message
+      });
+    }
+  });
+
+  app.get("/api/home-valuations", async (req, res) => {
+    try {
+      const { leadId } = req.query;
+      const valuations = await storage.getHomeValuations(
+        leadId ? parseInt(leadId as string) : undefined
+      );
+      res.json(valuations);
+    } catch (error) {
+      console.error("Error fetching home valuations:", error);
+      res.status(500).json({ message: "Failed to fetch home valuations" });
+    }
+  });
+
+  app.get("/api/home-valuations/:id", async (req, res) => {
+    try {
+      const valuation = await storage.getHomeValuation(parseInt(req.params.id));
+      if (!valuation) {
+        return res.status(404).json({ message: "Home valuation not found" });
+      }
+      res.json(valuation);
+    } catch (error) {
+      console.error("Error fetching home valuation:", error);
+      res.status(500).json({ message: "Failed to fetch home valuation" });
+    }
+  });
+
   // MLS Scraper Management Endpoints
   app.post("/api/scraper/sync", async (req, res) => {
     try {
@@ -720,21 +821,26 @@ async function generateAIResponse(message: string, conversation: any): Promise<s
   return responses[Math.floor(Math.random() * responses.length)];
 }
 
-function calculateLifestyleMatch(property: any, preferences: any): number {
+function calculateLifestyleMatch(property: any, preferences: any): number | null {
+  // Only calculate if user has provided authentic preferences
+  if (!preferences || Object.keys(preferences).length === 0) {
+    return null; // No lifestyle match without real user preferences
+  }
+
   let score = 0;
   let factors = 0;
 
   // Location preferences
   if (preferences.oceanView && property.amenities?.includes('Ocean View')) {
     score += 25;
+    factors++;
   }
-  factors++;
 
   // Property type matching
   if (preferences.propertyType && property.propertyType === preferences.propertyType) {
     score += 20;
+    factors++;
   }
-  factors++;
 
   // Size requirements
   if (preferences.familySize) {
@@ -742,20 +848,22 @@ function calculateLifestyleMatch(property: any, preferences: any): number {
     if (property.bedrooms >= familySize) {
       score += 15;
     }
+    factors++;
   }
-  factors++;
 
   // Lifestyle amenities
   if (preferences.lifestyle?.remoteWork && property.amenities?.includes('Home Office')) {
     score += 20;
+    factors++;
   }
   if (preferences.lifestyle?.oceanActivities && property.amenities?.includes('Beach Access')) {
     score += 20;
+    factors++;
   }
   if (preferences.lifestyle?.privacy && property.propertyType === 'estate') {
     score += 15;
+    factors++;
   }
-  factors += 3;
 
-  return Math.min(Math.round(score / factors * 4), 100);
+  return factors > 0 ? Math.min(Math.round(score / factors * 4), 100) : null;
 }

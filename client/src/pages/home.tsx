@@ -2,7 +2,7 @@ import Navigation from "@/components/navigation";
 import HeroSection from "@/components/hero-section";
 import PropertySearch from "@/components/property-search";
 import PropertyCard from "@/components/property-card";
-import AdvancedPropertyMap from "@/components/advanced-property-map";
+import RealEstateMap from "@/components/real-estate-map";
 import VirtualTourViewer from "@/components/virtual-tour-viewer";
 import AIChat from "@/components/ai-chat";
 import PropertyComparison from "@/components/property-comparison";
@@ -117,7 +117,7 @@ export default function Home() {
             </p>
           </motion.div>
           
-          <AdvancedPropertyMap />
+          <RealEstateMap />
         </div>
       </section>
 
