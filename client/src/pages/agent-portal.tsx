@@ -540,11 +540,11 @@ export default function AgentPortalPage() {
                         <Button 
                           variant="outline"
                           className="w-full h-14 flex items-center justify-between hover:bg-blue-50"
-                          onClick={() => setActiveTab('appointments')}
+                          onClick={() => window.location.href = '/calendar'}
                         >
                           <div className="flex items-center gap-3">
                             <Calendar className="h-5 w-5" />
-                            <span>Schedule Meeting</span>
+                            <span>Open Calendar</span>
                           </div>
                           <ChevronRight className="h-4 w-4" />
                         </Button>

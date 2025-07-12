@@ -15,6 +15,7 @@ export default function Navigation() {
     { name: "Properties", href: "/properties" },
     { name: "Virtual Tours", href: "/virtual-tours" },
     { name: "Neighborhoods", href: "/neighborhoods" },
+    { name: "Calendar", href: "/calendar" },
     { name: "Sell Your Home", href: "/sell-your-home" },
   ];
 
@@ -69,10 +70,12 @@ export default function Navigation() {
             </Button>
             
             {/* Calendar Button */}
-            <Button className="hidden md:flex" size="sm">
-              <Calendar className="h-4 w-4 mr-2" />
-              Book Tour
-            </Button>
+            <Link href="/calendar">
+              <Button className="hidden md:flex" size="sm">
+                <Calendar className="h-4 w-4 mr-2" />
+                Calendar
+              </Button>
+            </Link>
             
             {/* Mobile Menu */}
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
