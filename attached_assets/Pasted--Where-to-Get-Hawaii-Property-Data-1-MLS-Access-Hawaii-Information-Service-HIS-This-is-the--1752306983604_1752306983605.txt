@@ -1,0 +1,131 @@
+🌋 Where to Get Hawaii Property Data
+1. 🧠 MLS Access: Hawaii Information Service (HIS)
+This is the primary MLS covering most of Hawaii, including:
+
+Oʻahu (via HiCentral MLS)
+
+Big Island (via Hawaii Information Service)
+
+Kauaʻi
+
+Maui (via REALTORS® Association of Maui)
+
+🔗 Links:
+https://www.hawaiiinformation.com/
+
+https://www.hicentral.com/ (Oʻahu-specific)
+
+🔧 Access Options:
+Licensed REALTORS® or affiliates only
+
+API or RETS feed (some offer RESO Web API)
+
+Requires subscription + approval
+
+Data includes:
+
+Listings (active, pending, sold)
+
+Photos, video, virtual tour URLs
+
+Property details, pricing, geo-coordinates
+
+💡 Pro tip: Partner with a local agent/broker to access data legally if you're not licensed.
+
+2. 🏛️ Hawaii State Public Records & Tax Parcel Data
+You want raw real estate metadata? Go to the source.
+
+🗂️ Available Data:
+Property ownership
+
+Parcel boundaries (GIS)
+
+Building permits
+
+Zoning info
+
+Assessed values
+
+📍 Sources:
+Hawaii State GIS Portal: https://geoportal.hawaii.gov/
+
+Hawaii Real Property Tax Sites (county-specific):
+
+Oʻahu: https://www.realpropertyhonolulu.com/
+
+Maui: https://mauipropertytax.com/
+
+Big Island: https://qpublic.schneidercorp.com/Application.aspx?App=HawaiiCountyHI
+
+Kauaʻi: https://kauaihi.devnetwedge.com/
+
+🧭 Use Case:
+Build maps, layers, or overlays
+
+Validate listing data or create public record lookups
+
+Combine with listing data for richer profiles
+
+3. 💻 Third-Party APIs (No License Needed)
+If you don’t have MLS access or need rapid prototyping:
+
+🟢 Estated – https://estated.com/
+Property-level data nationwide (including Hawaii)
+
+Owner history, valuations, lot details, permits
+
+Simple REST API
+
+🟢 ATTOM Data – https://www.attomdata.com/
+Nationwide coverage, deep property + neighborhood info
+
+Offers parcel, zoning, demographic, and foreclosure data
+
+🟢 Zillow API (Unofficial) – Limited & not for production
+Scraping their site is risky and against ToS
+
+But it’s a quick hack for proof of concept
+
+🟢 Realtor.com (RapidAPI wrapper) – https://rapidapi.com/apidojo/api/realtor
+Scrapes public listing info via RapidAPI
+
+May violate TOS — not for production use
+
+🧪 Suggested Data Strategy for Your Site
+Feature	Data Source	Notes
+Active Listings	MLS (HIS, HiCentral)	Most reliable & legal
+Property History	Estated or ATTOM	Use if no MLS access
+Owner & Tax Info	Hawaii County RPT sites	Public & open
+Maps/Boundaries	Hawaii State GIS Portal	Great for visuals
+Virtual Tours	MLS media URLs or host your own	Custom 3D also possible
+
+🔐 Licensing & Legal
+If you plan to sell, monetize, or publicly distribute MLS listing data:
+
+✅ DO:
+
+Partner with a local broker
+
+Sign a data license agreement
+
+Comply with MLS display rules
+
+🚫 DON’T:
+
+Scrape MLS or Zillow blindly
+
+Assume public listing = free to use
+
+Use fake brokerage status — they check
+
+🧩 Want It All Wired Up?
+I can help:
+
+Integrate HIS or Estated APIs into your backend
+
+Set up cron jobs for syncing daily updates
+
+Visualize GIS + listing data on Mapbox/Leaflet
+
+Build secure dashboards for internal/private listings
+
