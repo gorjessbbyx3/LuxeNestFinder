@@ -5,13 +5,23 @@ import { FileBox as VR, Brain, Play } from "lucide-react";
 export default function HeroSection() {
   return (
     <section className="relative h-screen flex items-center justify-center overflow-hidden">
-      {/* Background */}
+      {/* Video Background */}
       <div className="absolute inset-0">
-        <img 
-          src="@assets/aerial-view2-768x537_1752329318459.jpg"
-          alt="Stunning aerial view of Honolulu and Diamond Head crater with luxury oceanfront properties"
+        <video 
+          autoPlay
+          muted
+          loop
+          playsInline
           className="w-full h-full object-cover"
-        />
+        >
+          <source src="@assets/Honolulu_Video_Link_Provided_1752352276060.mp4" type="video/mp4" />
+          {/* Fallback image for browsers that don't support video */}
+          <img 
+            src="@assets/aerial-view2-768x537_1752329318459.jpg"
+            alt="Stunning aerial view of Honolulu and Diamond Head crater with luxury oceanfront properties"
+            className="w-full h-full object-cover"
+          />
+        </video>
         <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-background/40 to-background/20" />
       </div>
       
