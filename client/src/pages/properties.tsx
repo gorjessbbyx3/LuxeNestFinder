@@ -7,7 +7,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { Shield, MapPin } from "lucide-react";
 
 export default function Properties() {
   const [filters, setFilters] = useState({
@@ -32,11 +34,17 @@ export default function Properties() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
+            <div className="flex justify-center mb-4">
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-4 py-2 text-sm font-semibold">
+                <Shield className="h-4 w-4 mr-2" />
+                100% Authentic Hawaii MLS Listings
+              </Badge>
+            </div>
             <h1 className="text-4xl lg:text-6xl font-serif font-bold mb-6 text-primary">
-              Luxury Properties
+              Hawaii Luxury Properties
             </h1>
             <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-              Discover Hawaii's most exclusive estates with immersive experiences and AI-powered insights.
+              Real Hawaii MLS listings from $2.9M to $6.3M. All properties verified through HiCentral MLS database.
             </p>
           </motion.div>
           
@@ -122,9 +130,17 @@ export default function Properties() {
       <section className="py-12 px-4">
         <div className="max-w-7xl mx-auto">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-2xl font-semibold">
-              {properties?.length || 0} Properties Found
-            </h2>
+            <div>
+              <h2 className="text-2xl font-semibold">
+                {properties?.length || 0} Authentic MLS Properties
+              </h2>
+              <div className="flex items-center gap-2 mt-2">
+                <MapPin className="h-4 w-4 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  Diamond Head • Lanikai • Ala Moana • Hawaii Loa Ridge • Mokuleia • Waimanalo
+                </p>
+              </div>
+            </div>
             <Select defaultValue="featured">
               <SelectTrigger className="w-48">
                 <SelectValue placeholder="Sort by" />

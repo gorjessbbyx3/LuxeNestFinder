@@ -12,7 +12,10 @@ import { useProperties } from "@/hooks/use-properties";
 import { useQuery } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
+import { Shield } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Home() {
   const { data: featuredProperties, isLoading: propertiesLoading } = useProperties({ 
@@ -60,11 +63,17 @@ export default function Home() {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
+            <div className="flex justify-center mb-4">
+              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-4 py-2 text-sm font-semibold">
+                <Shield className="h-4 w-4 mr-2" />
+                Authentic Hawaii MLS Properties
+              </Badge>
+            </div>
             <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-6 text-primary">
-              Curated Luxury Collection
+              Real Luxury Collection
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Each property is handpicked for its exceptional quality, location, and investment potential.
+              Authentic Hawaii luxury listings from $2.9M to $6.3M, sourced directly from HiCentral MLS database.
             </p>
           </motion.div>
           
@@ -92,10 +101,17 @@ export default function Home() {
             )}
           </div>
           
-          <div className="text-center">
-            <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
-              View All Properties
-            </Button>
+          <div className="text-center flex gap-4 justify-center">
+            <Link href="/properties">
+              <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                View All Properties
+              </Button>
+            </Link>
+            <Link href="/mls-listings">
+              <Button size="lg" variant="outline">
+                Browse MLS Listings
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

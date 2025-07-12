@@ -28,7 +28,12 @@ export default function PropertyCard({ property }: PropertyCardProps) {
           />
           
           {/* Status Badge */}
-          <div className="absolute top-4 left-4">
+          <div className="absolute top-4 left-4 flex flex-col gap-2">
+            {property.mlsNumber && (
+              <Badge className="bg-green-600 text-white font-semibold">
+                MLS #{property.mlsNumber}
+              </Badge>
+            )}
             {property.featured && (
               <Badge className="bg-primary text-primary-foreground">
                 Featured

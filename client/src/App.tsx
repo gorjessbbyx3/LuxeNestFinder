@@ -13,6 +13,7 @@ import SellYourHome from "@/pages/sell-your-home";
 import AgentPortal from "@/pages/agent-portal";
 import Calendar from "@/pages/calendar";
 import Inbox from "@/pages/inbox";
+import MLSListings from "@/pages/mls-listings";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -27,6 +28,7 @@ function Router() {
       <Route path="/agent-portal" component={AgentPortal} />
       <Route path="/calendar" component={Calendar} />
       <Route path="/inbox" component={Inbox} />
+      <Route path="/mls-listings" component={MLSListings} />
       <Route component={NotFound} />
     </Switch>
   );
