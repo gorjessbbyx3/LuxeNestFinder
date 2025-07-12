@@ -2,7 +2,7 @@ import Navigation from "@/components/navigation";
 import HeroSection from "@/components/hero-section";
 import PropertySearch from "@/components/property-search";
 import PropertyCard from "@/components/property-card";
-import RealLocationMap from "@/components/real-location-map";
+import AdvancedPropertyMap from "@/components/advanced-property-map";
 import VirtualTourViewer from "@/components/virtual-tour-viewer";
 import AIChat from "@/components/ai-chat";
 import PropertyComparison from "@/components/property-comparison";
@@ -110,14 +110,14 @@ export default function Home() {
             className="text-center mb-16"
           >
             <h2 className="text-4xl lg:text-5xl font-serif font-bold mb-6 text-primary">
-              Real Geographic Locations
+              Elite Property Intelligence Platform
             </h2>
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Explore actual property locations with precise GPS coordinates across all Hawaiian islands - from Diamond Head to Princeville.
+              Advanced analytics, investment metrics, and lifestyle scoring for Hawaii's most exclusive properties. Real data, real locations, real insights.
             </p>
           </motion.div>
           
-          <RealLocationMap />
+          <AdvancedPropertyMap />
         </div>
       </section>
 
