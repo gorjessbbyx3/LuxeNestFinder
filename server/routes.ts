@@ -13,6 +13,7 @@ import {
 } from "@shared/schema";
 import { generatePropertyDescription } from "./lib/openai";
 import { hawaiiParcelService } from "./lib/hawaii-parcels";
+import { hiCentralMLSService } from "./lib/hicentral-mls";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
@@ -551,6 +552,101 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error enriching property with parcel data:", error);
       res.status(500).json({ error: "Failed to enrich property data" });
+    }
+  });
+
+  // HiCentral MLS Integration - Real Hawaii MLS Data
+  app.get("/api/mls/luxury", async (req, res) => {
+    try {
+      const { minPrice = 1500000 } = req.query;
+      const listings = await hiCentralMLSService.getLuxuryListings(Number(minPrice));
+      res.json(listings);
+    } catch (error) {
+      console.error("Error fetching luxury MLS listings:", error);
+      res.status(500).json({ error: "Failed to fetch MLS data" });
+    }
+  });
+
+  app.get("/api/mls/search", async (req, res) => {
+    try {
+      const filters = {
+        minPrice: req.query.minPrice ? Number(req.query.minPrice) : undefined,
+        maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
+        propertyType: req.query.propertyType as string,
+        neighborhood: req.query.neighborhood as string,
+        bedrooms: req.query.bedrooms ? Number(req.query.bedrooms) : undefined,
+        bathrooms: req.query.bathrooms ? Number(req.query.bathrooms) : undefined,
+        minSqft: req.query.minSqft ? Number(req.query.minSqft) : undefined,
+        maxSqft: req.query.maxSqft ? Number(req.query.maxSqft) : undefined,
+        oceanView: req.query.oceanView === 'true',
+        status: req.query.status as string,
+        limit: req.query.limit ? Number(req.query.limit) : 20,
+        offset: req.query.offset ? Number(req.query.offset) : 0,
+      };
+
+      const listings = await hiCentralMLSService.searchProperties(filters);
+      res.json(listings);
+    } catch (error) {
+      console.error("Error searching MLS listings:", error);
+      res.status(500).json({ error: "Failed to search MLS data" });
+    }
+  });
+
+  app.get("/api/mls/property/:mlsNumber", async (req, res) => {
+    try {
+      const { mlsNumber } = req.params;
+      const listing = await hiCentralMLSService.getPropertyByMLS(mlsNumber);
+      
+      if (!listing) {
+        return res.status(404).json({ error: "MLS listing not found" });
+      }
+      
+      res.json(listing);
+    } catch (error) {
+      console.error("Error fetching MLS property:", error);
+      res.status(500).json({ error: "Failed to fetch MLS property" });
+    }
+  });
+
+  app.get("/api/mls/nearby", async (req, res) => {
+    try {
+      const { lat, lng, radius = 5 } = req.query;
+      
+      if (!lat || !lng) {
+        return res.status(400).json({ error: "Missing latitude or longitude" });
+      }
+      
+      const listings = await hiCentralMLSService.getPropertiesInRadius(
+        Number(lat),
+        Number(lng),
+        Number(radius)
+      );
+      
+      res.json(listings);
+    } catch (error) {
+      console.error("Error fetching nearby MLS properties:", error);
+      res.status(500).json({ error: "Failed to fetch nearby MLS properties" });
+    }
+  });
+
+  app.get("/api/mls/open-houses", async (req, res) => {
+    try {
+      const openHouses = await hiCentralMLSService.getOpenHouses();
+      res.json(openHouses);
+    } catch (error) {
+      console.error("Error fetching open houses:", error);
+      res.status(500).json({ error: "Failed to fetch open houses" });
+    }
+  });
+
+  app.get("/api/mls/market-stats/:neighborhood", async (req, res) => {
+    try {
+      const { neighborhood } = req.params;
+      const stats = await hiCentralMLSService.getMarketStats(neighborhood);
+      res.json(stats);
+    } catch (error) {
+      console.error("Error fetching market stats:", error);
+      res.status(500).json({ error: "Failed to fetch market statistics" });
     }
   });
 
