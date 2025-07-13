@@ -122,6 +122,7 @@ export interface IStorage {
   }): Promise<Appointment[]>;
   createAppointment(appointment: InsertAppointment): Promise<Appointment>;
   updateAppointment(id: number, appointment: Partial<InsertAppointment>): Promise<Appointment>;
+  deleteAppointment(id: number): Promise<void>;
   
   // Contract & Offer Management
   getContracts(filters?: {
@@ -170,7 +171,7 @@ export interface IStorage {
   // Home Valuations
   createHomeValuation(valuation: InsertHomeValuation): Promise<HomeValuation>;
   getHomeValuation(id: number): Promise<HomeValuation | undefined>;
-  getHomeValuations(leadId?: number): Promise<HomeValuation[]>;
+  getHomeValuations(filters?: { propertyId?: number; leadId?: number }): Promise<HomeValuation[]>;
   updateHomeValuation(id: number, valuation: Partial<InsertHomeValuation>): Promise<HomeValuation>;
   
   // Market Predictions  
@@ -546,6 +547,10 @@ export class DatabaseStorage implements IStorage {
     return updatedAppointment;
   }
 
+  async deleteAppointment(id: number): Promise<void> {
+    await db.delete(appointments).where(eq(appointments.id, id));
+  }
+
   async getContracts(filters?: {
     agentId?: number;
     propertyId?: number;
@@ -730,11 +735,18 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-  async getHomeValuations(leadId?: number): Promise<HomeValuation[]> {
-    if (leadId) {
-      return await db.select().from(homeValuations).where(eq(homeValuations.leadId, leadId));
+  async getHomeValuations(filters?: { propertyId?: number; leadId?: number }): Promise<HomeValuation[]> {
+    let query = db.select().from(homeValuations);
+    const conditions: any[] = [];
+
+    if (filters?.leadId) conditions.push(eq(homeValuations.leadId, filters.leadId));
+    if (filters?.propertyId) conditions.push(eq(homeValuations.propertyId, filters.propertyId));
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions));
     }
-    return await db.select().from(homeValuations).orderBy(desc(homeValuations.createdAt));
+
+    return await query.orderBy(desc(homeValuations.createdAt));
   }
 
   async updateHomeValuation(id: number, valuation: Partial<InsertHomeValuation>): Promise<HomeValuation> {

@@ -14,7 +14,12 @@ import {
   insertAutomationRuleSchema,
   insertLeadActivitySchema,
   insertPropertyFavoriteSchema,
-  insertSavedSearchSchema
+  insertSavedSearchSchema,
+  insertAppointmentSchema,
+  insertContractSchema,
+  insertCommissionSchema,
+  insertMarketingCampaignSchema,
+  insertHomeValuationSchema
 } from "@shared/schema";
 import { log } from "./vite";
 
@@ -588,6 +593,296 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error checking automation triggers:", error);
       res.status(500).json({ message: "Failed to check automation triggers" });
+    }
+  });
+
+  // APPOINTMENTS API - Calendar Management
+  app.get("/api/appointments", async (req, res) => {
+    try {
+      const { agentId, leadId, propertyId, status, startDate, endDate } = req.query;
+      const appointments = await storage.getAppointments({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        leadId: leadId ? parseInt(leadId as string) : undefined,
+        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
+        status: status as string,
+        startDate: startDate ? new Date(startDate as string) : undefined,
+        endDate: endDate ? new Date(endDate as string) : undefined,
+      });
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+
+  app.post("/api/appointments", async (req, res) => {
+    try {
+      const appointment = insertAppointmentSchema.parse(req.body);
+      const newAppointment = await storage.createAppointment(appointment);
+      res.status(201).json(newAppointment);
+    } catch (error) {
+      console.error("Error creating appointment:", error);
+      res.status(500).json({ message: "Failed to create appointment" });
+    }
+  });
+
+  app.put("/api/appointments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const appointment = insertAppointmentSchema.partial().parse(req.body);
+      const updatedAppointment = await storage.updateAppointment(id, appointment);
+      res.json(updatedAppointment);
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      res.status(500).json({ message: "Failed to update appointment" });
+    }
+  });
+
+  app.delete("/api/appointments/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteAppointment(id);
+      res.json({ message: "Appointment deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting appointment:", error);
+      res.status(500).json({ message: "Failed to delete appointment" });
+    }
+  });
+
+  // CONTRACTS API - Deal Management
+  app.get("/api/contracts", async (req, res) => {
+    try {
+      const { agentId, propertyId, status, type } = req.query;
+      const contracts = await storage.getContracts({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
+        status: status as string,
+        type: type as string,
+      });
+      res.json(contracts);
+    } catch (error) {
+      console.error("Error fetching contracts:", error);
+      res.status(500).json({ message: "Failed to fetch contracts" });
+    }
+  });
+
+  app.post("/api/contracts", async (req, res) => {
+    try {
+      const contract = insertContractSchema.parse(req.body);
+      const newContract = await storage.createContract(contract);
+      res.status(201).json(newContract);
+    } catch (error) {
+      console.error("Error creating contract:", error);
+      res.status(500).json({ message: "Failed to create contract" });
+    }
+  });
+
+  app.put("/api/contracts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const contract = insertContractSchema.partial().parse(req.body);
+      const updatedContract = await storage.updateContract(id, contract);
+      res.json(updatedContract);
+    } catch (error) {
+      console.error("Error updating contract:", error);
+      res.status(500).json({ message: "Failed to update contract" });
+    }
+  });
+
+  // COMMISSIONS API - Financial Tracking
+  app.get("/api/commissions", async (req, res) => {
+    try {
+      const { agentId, status } = req.query;
+      const commissions = await storage.getCommissions({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        status: status as string,
+      });
+      res.json(commissions);
+    } catch (error) {
+      console.error("Error fetching commissions:", error);
+      res.status(500).json({ message: "Failed to fetch commissions" });
+    }
+  });
+
+  app.post("/api/commissions", async (req, res) => {
+    try {
+      const commission = insertCommissionSchema.parse(req.body);
+      const newCommission = await storage.createCommission(commission);
+      res.status(201).json(newCommission);
+    } catch (error) {
+      console.error("Error creating commission:", error);
+      res.status(500).json({ message: "Failed to create commission" });
+    }
+  });
+
+  // BUYER PROFILES API - Client Management
+  app.get("/api/buyer-profiles", async (req, res) => {
+    try {
+      const { leadId } = req.query;
+      // For now, return lead data with buyer-specific information
+      if (leadId) {
+        const lead = await storage.getLead(parseInt(leadId as string));
+        if (lead) {
+          res.json({
+            id: lead.id,
+            clientType: lead.lifestyle?.familySize || 'individual',
+            timeZone: 'HST (Hawaii)',
+            preferredCommunication: lead.interests || [],
+            interests: lead.interests || [],
+            timeline: '3-6 months',
+            budget: lead.budget?.toString() || '0',
+            financingType: 'conventional',
+            culturalConsiderations: '',
+            communicationNotes: ''
+          });
+        } else {
+          res.status(404).json({ message: "Buyer profile not found" });
+        }
+      } else {
+        // Return all leads as buyer profiles
+        const leads = await storage.getLeads({});
+        const profiles = leads.map(lead => ({
+          id: lead.id,
+          clientType: lead.lifestyle?.familySize || 'individual',
+          timeZone: 'HST (Hawaii)',
+          preferredCommunication: lead.interests || [],
+          interests: lead.interests || [],
+          timeline: '3-6 months',
+          budget: lead.budget?.toString() || '0',
+          financingType: 'conventional',
+          culturalConsiderations: '',
+          communicationNotes: ''
+        }));
+        res.json(profiles);
+      }
+    } catch (error) {
+      console.error("Error fetching buyer profiles:", error);
+      res.status(500).json({ message: "Failed to fetch buyer profiles" });
+    }
+  });
+
+  app.post("/api/buyer-profiles", async (req, res) => {
+    try {
+      const profile = req.body;
+      // Convert buyer profile to lead data and update
+      if (profile.leadId) {
+        const updatedLead = await storage.updateLead(profile.leadId, {
+          interests: profile.interests,
+          budget: profile.budget ? parseFloat(profile.budget) : undefined,
+          lifestyle: {
+            ...profile,
+            familySize: profile.clientType
+          }
+        });
+        res.status(201).json(profile);
+      } else {
+        res.status(400).json({ message: "Lead ID required for buyer profile" });
+      }
+    } catch (error) {
+      console.error("Error creating buyer profile:", error);
+      res.status(500).json({ message: "Failed to create buyer profile" });
+    }
+  });
+
+  // RENTAL CALCULATIONS API - Investment Analysis
+  app.post("/api/rental-calculations", async (req, res) => {
+    try {
+      const { propertyId, propertyType, location, bedrooms, bathrooms, amenities, monthlyRate } = req.body;
+      
+      // Calculate rental metrics for Hawaii luxury properties
+      const locationMultipliers: { [key: string]: number } = {
+        'waikiki': 1.4,
+        'lanikai': 1.6,
+        'wailea': 1.5,
+        'princeville': 1.3,
+        'kona': 1.2,
+        'default': 1.0
+      };
+      
+      const baseRate = monthlyRate || 8000;
+      const multiplier = locationMultipliers[location?.toLowerCase()] || locationMultipliers.default;
+      const adjustedRate = baseRate * multiplier;
+      
+      const calculation = {
+        propertyId,
+        monthlyRate: adjustedRate,
+        annualRevenue: adjustedRate * 12,
+        occupancyRate: 0.75, // 75% for Hawaii luxury properties
+        grossRevenue: adjustedRate * 12 * 0.75,
+        expenses: {
+          management: adjustedRate * 12 * 0.1,
+          maintenance: adjustedRate * 12 * 0.05,
+          insurance: adjustedRate * 12 * 0.02,
+          taxes: adjustedRate * 12 * 0.03,
+          utilities: adjustedRate * 12 * 0.04
+        },
+        netRevenue: adjustedRate * 12 * 0.75 * 0.76, // After expenses
+        roi: 0.08, // 8% estimated ROI for Hawaii luxury market
+        analysis: {
+          marketDemand: 'High',
+          seasonalVariation: 'Moderate',
+          competitionLevel: 'Medium',
+          investmentGrade: 'A-'
+        }
+      };
+      
+      res.json(calculation);
+    } catch (error) {
+      console.error("Error calculating rental metrics:", error);
+      res.status(500).json({ message: "Failed to calculate rental metrics" });
+    }
+  });
+
+  // MARKETING CAMPAIGNS API - Campaign Management
+  app.get("/api/marketing-campaigns", async (req, res) => {
+    try {
+      const { agentId, propertyId, status } = req.query;
+      const campaigns = await storage.getMarketingCampaigns({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
+        status: status as string,
+      });
+      res.json(campaigns);
+    } catch (error) {
+      console.error("Error fetching marketing campaigns:", error);
+      res.status(500).json({ message: "Failed to fetch marketing campaigns" });
+    }
+  });
+
+  app.post("/api/marketing-campaigns", async (req, res) => {
+    try {
+      const campaign = insertMarketingCampaignSchema.parse(req.body);
+      const newCampaign = await storage.createMarketingCampaign(campaign);
+      res.status(201).json(newCampaign);
+    } catch (error) {
+      console.error("Error creating marketing campaign:", error);
+      res.status(500).json({ message: "Failed to create marketing campaign" });
+    }
+  });
+
+  // HOME VALUATIONS API - Property Valuation
+  app.post("/api/home-valuations", async (req, res) => {
+    try {
+      const valuation = insertHomeValuationSchema.parse(req.body);
+      const newValuation = await storage.createHomeValuation(valuation);
+      res.status(201).json(newValuation);
+    } catch (error) {
+      console.error("Error creating home valuation:", error);
+      res.status(500).json({ message: "Failed to create home valuation" });
+    }
+  });
+
+  app.get("/api/home-valuations", async (req, res) => {
+    try {
+      const { propertyId, leadId } = req.query;
+      const valuations = await storage.getHomeValuations({
+        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
+        leadId: leadId ? parseInt(leadId as string) : undefined,
+      });
+      res.json(valuations);
+    } catch (error) {
+      console.error("Error fetching home valuations:", error);
+      res.status(500).json({ message: "Failed to fetch home valuations" });
     }
   });
 

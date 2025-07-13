@@ -1,0 +1,76 @@
+Based on my analysis of the codebase, I found several mock/demo features and placeholders that lack proper backend endpoints. Here's a comprehensive list:
+
+1. Agent Portal Issues
+Calendar Component
+Error: Calendar is not defined in EmbeddedCalendar component
+Issue: Missing proper calendar import/implementation
+Location: client/src/pages/agent-portal.tsx line ~4835
+Select Component Errors
+Error: Multiple "Select.Item must have a value prop that is not an empty string" errors
+Issue: Empty string values in SelectItem components
+Location: Various Select components in agent portal
+2. Missing Backend Endpoints
+Hawaii Marketing Automation
+Mock Features:
+Email template management (GET/POST/PUT /api/message-templates)
+Campaign creation and management
+Automation rules execution
+Location: client/src/components/hawaii-marketing-automation.tsx
+Hawaii Buyer Profile
+Mock Features:
+Buyer profile saving (no /api/buyer-profiles endpoint)
+"Generate Hawaii Guide" button (no implementation)
+Location: client/src/components/hawaii-buyer-profile.tsx
+Vacation Rental Calculator
+Mock Features:
+All calculations are frontend-only
+No backend validation or data persistence
+No /api/rental-calculations endpoint
+Location: client/src/components/vacation-rental-calculator.tsx
+3. Agent Portal Mock Features
+Appointment Management
+Missing Endpoints:
+POST /api/appointments (create appointment)
+PATCH /api/appointments/:id (update appointment)
+Appointment form submission has no backend handler
+Lead Management
+Mock Features:
+Lead creation mutation exists but may not have full backend support
+Lead activity tracking endpoints missing
+Lead communication automation features
+Contract Management
+Mock Features:
+Contract creation button (no backend endpoint)
+Contract pipeline management
+Deal status updates
+Commission Tracking
+Mock Features:
+Commission recording (no /api/commissions POST endpoint)
+Commission invoice generation
+4. Property Search Issues
+AI-Powered Search
+Mock Feature: AI search toggle in property search
+Issue: Shows "AI-Powered Search Available" notice but no actual AI implementation
+Location: client/src/components/property-search.tsx
+5. Open House Issues
+Database Schema Error
+Error: column "address" does not exist in open house scraper
+Issue: Database schema mismatch for open houses table
+Location: Server console shows this error during open house updates
+6. Virtual Tours
+Mock Implementation
+Mock Features: Virtual tour viewer promotes "professional scheduling services"
+Issue: No actual virtual tour functionality implemented
+Location: client/src/components/virtual-tour-viewer.tsx
+7. Property Comparison
+Limited Backend Support
+Mock Features: Property comparison tool shows "authentic data or professional consultation prompts"
+Issue: Comparison logic may lack full backend integration
+Recommendations to Fix:
+Fix Calendar Import Error - Add proper Calendar component import
+Fix Select Component Values - Remove empty string values from SelectItem components
+Implement Missing Endpoints - Create backend endpoints for all CRM features
+Fix Open House Database Schema - Add missing "address" column or update query
+Replace Mock Buttons - Either implement functionality or remove non-functional buttons
+Add Proper Error Handling - Replace placeholder text with proper error states
+The platform maintains 100% authentic data integrity for property listings, but many CRM automation features are still in demo/placeholder state without proper backend implementation.

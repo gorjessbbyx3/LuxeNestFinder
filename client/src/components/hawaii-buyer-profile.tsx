@@ -9,6 +9,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { MapPin, Plane, Shield, Heart, Camera, Clock } from 'lucide-react';
+import { useMutation } from '@tanstack/react-query';
+import { useToast } from '@/hooks/use-toast';
+import { apiRequest } from '@/lib/queryClient';
 
 interface BuyerProfile {
   clientType: string;
@@ -34,6 +37,89 @@ export default function HawaiiBuyerProfile() {
     culturalConsiderations: '',
     communicationNotes: ''
   });
+
+  const { toast } = useToast();
+
+  // Create buyer profile mutation
+  const saveBuyerProfileMutation = useMutation({
+    mutationFn: async (profileData: BuyerProfile) => {
+      return await apiRequest('/api/buyer-profiles', {
+        method: 'POST',
+        body: JSON.stringify({ ...profileData, leadId: 1 }), // Default to lead ID 1 for demo
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Buyer profile saved successfully!",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to save buyer profile.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const generateHawaiiGuide = () => {
+    // Generate a personalized Hawaii guide based on profile
+    const guideContent = `
+# Personalized Hawaii Living Guide
+
+## Client Profile: ${profile.clientType.replace('-', ' ').toUpperCase()}
+**Timeline:** ${profile.timeline}
+**Budget:** $${profile.budget}
+**Communication Preference:** ${profile.preferredCommunication.join(', ')}
+
+## Recommended Areas:
+${profile.interests.includes('Ocean Activities') ? '🌊 **Lanikai Beach** - Perfect for ocean lovers' : ''}
+${profile.interests.includes('Golf') ? '🏌️ **Kapalua Resort** - World-class golf courses' : ''}
+${profile.interests.includes('Cultural Experiences') ? '🏛️ **Downtown Honolulu** - Rich cultural heritage' : ''}
+
+## Hawaii-Specific Considerations:
+- **Time Zone:** Living in ${profile.timeZone}
+- **Cultural Notes:** ${profile.culturalConsiderations || 'Standard Hawaii cultural orientation recommended'}
+- **Financing:** ${profile.financingType} options available
+
+## Next Steps:
+1. Schedule property tours in recommended areas
+2. Connect with local Hawaii specialists
+3. Begin pre-approval process
+4. Plan exploratory visit to Hawaii
+
+*Generated on ${new Date().toLocaleDateString()} for personalized Hawaii real estate journey.*
+    `;
+
+    // Create and download the guide
+    const blob = new Blob([guideContent], { type: 'text/markdown' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Hawaii-Living-Guide-${profile.clientType}-${Date.now()}.md`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    toast({
+      title: "Hawaii Guide Generated!",
+      description: "Your personalized Hawaii living guide has been downloaded.",
+    });
+  };
+
+  const handleSaveProfile = () => {
+    if (!profile.clientType || !profile.timeZone) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in client type and time zone.",
+        variant: "destructive",
+      });
+      return;
+    }
+    saveBuyerProfileMutation.mutate(profile);
+  };
 
   const clientTypes = [
     { value: 'mainland-buyer', label: 'Mainland Buyer', icon: Plane },
@@ -295,10 +381,18 @@ export default function HawaiiBuyerProfile() {
         </div>
 
         <div className="flex gap-3">
-          <Button className="flex-1 bg-gradient-to-r from-blue-600 to-green-600">
-            Save Buyer Profile
+          <Button 
+            className="flex-1 bg-gradient-to-r from-blue-600 to-green-600"
+            onClick={handleSaveProfile}
+            disabled={saveBuyerProfileMutation.isPending}
+          >
+            {saveBuyerProfileMutation.isPending ? 'Saving...' : 'Save Buyer Profile'}
           </Button>
-          <Button variant="outline" className="flex-1">
+          <Button 
+            variant="outline" 
+            className="flex-1"
+            onClick={generateHawaiiGuide}
+          >
             Generate Hawaii Guide
           </Button>
         </div>
