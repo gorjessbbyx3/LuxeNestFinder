@@ -40,16 +40,6 @@ app.use((req, res, next) => {
 (async () => {
   await registerRoutes(app);
   const server = createServer(app);
-  
-  // Start open house scraper scheduler
-  log("🏠 Starting Open House Scraper - Friday 3:35 PM HST Schedule");
-  const { openHouseScraper } = await import("./lib/open-house-scraper");
-  openHouseScraper.startScheduler();
-
-  // Start HiCentral scraper for continuous MLS sync
-  log("🔄 Starting HiCentral MLS Scraper - Continuous Sync Every 30 Minutes");
-  const { hicentralScraper } = await import("./lib/hicentral-scraper");
-  await hicentralScraper.startContinuousSync(30);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
@@ -75,5 +65,20 @@ app.use((req, res, next) => {
   const port = parseInt(process.env.PORT || '5000', 10);
   server.listen(port, "0.0.0.0", () => {
     log(`serving on port ${port}`);
+    
+    // Start scrapers after server is running
+    (async () => {
+      try {
+        log("🏠 Starting Open House Scraper - Friday 3:35 PM HST Schedule");
+        const { openHouseScraper } = await import("./lib/open-house-scraper");
+        openHouseScraper.startScheduler();
+
+        log("🔄 Starting HiCentral MLS Scraper - Continuous Sync Every 30 Minutes");
+        const { hicentralScraper } = await import("./lib/hicentral-scraper");
+        await hicentralScraper.startContinuousSync(30);
+      } catch (error) {
+        log(`Error starting scrapers: ${error}`);
+      }
+    })();
   });
 })();

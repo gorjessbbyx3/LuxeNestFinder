@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import aerialImage from "@assets/aerial-view2-768x537_1752329318459.jpg";
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -175,7 +176,7 @@ export default function RealEstateMap() {
         <div 
           className="relative h-[600px] bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 dark:from-blue-900/20 dark:via-blue-800/30 dark:to-blue-700/40"
           style={{
-            backgroundImage: "url('@assets/aerial-view2-768x537_1752329318459.jpg')",
+            backgroundImage: `url(${aerialImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center"
           }}

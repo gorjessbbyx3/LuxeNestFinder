@@ -2137,7 +2137,7 @@ function EmbeddedInbox() {
   const INQUIRY_TYPES = {
     contact: { label: 'Contact Form', icon: Mail, color: 'bg-blue-500' },
     property: { label: 'Property Inquiry', icon: Building, color: 'bg-green-500' },
-    booking: { label: 'Tour Booking', icon: Calendar, color: 'bg-purple-500' },
+    booking: { label: 'Tour Booking', icon: CalendarIcon, color: 'bg-purple-500' },
     valuation: { label: 'Home Valuation', icon: DollarSign, color: 'bg-orange-500' },
     consultation: { label: 'Consultation', icon: Users, color: 'bg-pink-500' }
   };
