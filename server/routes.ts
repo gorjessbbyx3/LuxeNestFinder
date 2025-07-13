@@ -1,53 +1,40 @@
-import type { Express } from "express";
-import { createServer, type Server } from "http";
+import { Express, Request, Response, NextFunction } from "express";
+import { Server } from "http";
+import { z } from "zod";
 import { storage } from "./storage";
 import { 
+  insertPropertySchema, 
+  insertNeighborhoodSchema, 
   insertLeadSchema, 
   insertPropertyInquirySchema, 
   insertChatConversationSchema,
-  insertAgentSchema,
-  insertAppointmentSchema,
-  insertContractSchema,
-  insertCommissionSchema,
-  insertMarketingCampaignSchema,
-  insertHomeValuationSchema
+  insertTaskSchema,
+  insertCommunicationSchema,
+  insertMessageTemplateSchema,
+  insertAutomationRuleSchema,
+  insertLeadActivitySchema,
+  insertPropertyFavoriteSchema,
+  insertSavedSearchSchema
 } from "@shared/schema";
-import { generatePropertyDescription } from "./lib/openai";
-import { hawaiiParcelService } from "./lib/hawaii-parcels";
-import { hiCentralMLSService } from "./lib/hicentral-mls";
-import { mlsScraperService } from "./lib/mls-scraper";
-import { marketValuePredictor } from "./lib/market-value-predictor";
 import { log } from "./vite";
 
-const PORT = Number(process.env.PORT) || 5000;
+const PORT = parseInt(process.env.PORT || "3000");
 
 export async function registerRoutes(app: Express): Promise<Server> {
-
-  // Properties endpoints
+  // Properties API
   app.get("/api/properties", async (req, res) => {
     try {
-      const {
-        minPrice,
-        maxPrice,
-        bedrooms,
-        propertyType,
-        city,
-        featured,
-        limit = 20,
-        offset = 0
-      } = req.query;
-
-      const filters: any = {};
-      if (minPrice) filters.minPrice = Number(minPrice);
-      if (maxPrice) filters.maxPrice = Number(maxPrice);
-      if (bedrooms) filters.bedrooms = Number(bedrooms);
-      if (propertyType) filters.propertyType = String(propertyType);
-      if (city) filters.city = String(city);
-      if (featured !== undefined) filters.featured = featured === 'true';
-      filters.limit = Number(limit);
-      filters.offset = Number(offset);
-
-      const properties = await storage.getProperties(filters);
+      const { minPrice, maxPrice, bedrooms, propertyType, city, featured, limit, offset } = req.query;
+      const properties = await storage.getProperties({
+        minPrice: minPrice ? parseInt(minPrice as string) : undefined,
+        maxPrice: maxPrice ? parseInt(maxPrice as string) : undefined,
+        bedrooms: bedrooms ? parseInt(bedrooms as string) : undefined,
+        propertyType: propertyType as string,
+        city: city as string,
+        featured: featured === 'true',
+        limit: limit ? parseInt(limit as string) : undefined,
+        offset: offset ? parseInt(offset as string) : undefined,
+      });
       res.json(properties);
     } catch (error) {
       console.error("Error fetching properties:", error);
@@ -57,13 +44,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.get("/api/properties/:id", async (req, res) => {
     try {
-      const propertyId = parseInt(req.params.id);
-
-      if (isNaN(propertyId)) {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
         return res.status(400).json({ message: "Invalid property ID" });
       }
-
-      const property = await storage.getProperty(propertyId);
+      const property = await storage.getProperty(id);
       if (!property) {
         return res.status(404).json({ message: "Property not found" });
       }
@@ -74,17 +59,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/properties/search/:query", async (req, res) => {
+  app.post("/api/properties", async (req, res) => {
     try {
-      const properties = await storage.searchProperties(req.params.query);
-      res.json(properties);
+      const property = insertPropertySchema.parse(req.body);
+      const newProperty = await storage.createProperty(property);
+      res.status(201).json(newProperty);
     } catch (error) {
-      console.error("Error searching properties:", error);
-      res.status(500).json({ message: "Failed to search properties" });
+      console.error("Error creating property:", error);
+      res.status(500).json({ message: "Failed to create property" });
     }
   });
 
-  // Neighborhoods endpoints
+  // Neighborhoods API
   app.get("/api/neighborhoods", async (req, res) => {
     try {
       const neighborhoods = await storage.getNeighborhoods();
@@ -95,364 +81,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.get("/api/neighborhoods/:id", async (req, res) => {
-    try {
-      const neighborhood = await storage.getNeighborhood(Number(req.params.id));
-      if (!neighborhood) {
-        return res.status(404).json({ message: "Neighborhood not found" });
-      }
-      res.json(neighborhood);
-    } catch (error) {
-      console.error("Error fetching neighborhood:", error);
-      res.status(500).json({ message: "Failed to fetch neighborhood" });
-    }
-  });
-
-  // Leads endpoints
+  // Leads API
   app.post("/api/leads", async (req, res) => {
     try {
-      const leadData = insertLeadSchema.parse(req.body);
-      const lead = await storage.createLead(leadData);
-      res.status(201).json(lead);
+      const lead = insertLeadSchema.parse(req.body);
+      const newLead = await storage.createLead(lead);
+      res.status(201).json(newLead);
     } catch (error) {
       console.error("Error creating lead:", error);
-      res.status(400).json({ message: "Invalid lead data" });
+      res.status(500).json({ message: "Failed to create lead" });
     }
   });
 
-  // Property inquiries endpoints
-  app.post("/api/property-inquiries", async (req, res) => {
-    try {
-      const inquiryData = insertPropertyInquirySchema.parse(req.body);
-      const inquiry = await storage.createPropertyInquiry(inquiryData);
-      res.status(201).json(inquiry);
-    } catch (error) {
-      console.error("Error creating property inquiry:", error);
-      res.status(400).json({ message: "Invalid inquiry data" });
-    }
-  });
-
-  app.get("/api/property-inquiries", async (req, res) => {
-    try {
-      const { propertyId, leadId } = req.query;
-      const inquiries = await storage.getPropertyInquiries(
-        propertyId ? Number(propertyId) : undefined,
-        leadId ? Number(leadId) : undefined
-      );
-      res.json(inquiries);
-    } catch (error) {
-      console.error("Error fetching inquiries:", error);
-      res.status(500).json({ message: "Failed to fetch inquiries" });
-    }
-  });
-
-  // Chat conversations endpoints
-  app.post("/api/chat", async (req, res) => {
-    try {
-      const { message, leadId, conversationId } = req.body;
-
-      if (!message) {
-        return res.status(400).json({ message: "Message is required" });
-      }
-
-      let conversation;
-
-      if (conversationId) {
-        conversation = await storage.getChatConversation(conversationId);
-        if (!conversation) {
-          return res.status(404).json({ message: "Conversation not found" });
-        }
-      } else {
-        // Create new conversation
-        const conversationData = insertChatConversationSchema.parse({
-          leadId: leadId || null,
-          messages: [],
-        });
-        conversation = await storage.createChatConversation(conversationData);
-      }
-
-      // Add user message
-      const updatedMessages = [
-        ...conversation.messages,
-        {
-          role: 'user' as const,
-          content: message,
-          timestamp: new Date().toISOString(),
-        }
-      ];
-
-      // Generate AI response (simplified - in production, integrate with OpenAI)
-      const aiResponse = await generateAIResponse(message, conversation);
-
-      updatedMessages.push({
-        role: 'assistant' as const,
-        content: aiResponse,
-        timestamp: new Date().toISOString(),
-      });
-
-      // Update conversation
-      const updatedConversation = await storage.updateChatConversation(conversation.id, {
-        messages: updatedMessages,
-      });
-
-      res.json(updatedConversation);
-    } catch (error) {
-      console.error("Error in chat:", error);
-      res.status(500).json({ message: "Chat service unavailable" });
-    }
-  });
-
-  // AI property description generation
-  app.post("/api/ai/generate-description", async (req, res) => {
-    try {
-      const { propertyData } = req.body;
-
-      if (!propertyData) {
-        return res.status(400).json({ message: "Property data is required" });
-      }
-
-      const description = await generatePropertyDescription(propertyData);
-      res.json({ description });
-    } catch (error) {
-      console.error("Error generating description:", error);
-      res.status(500).json({ message: "Failed to generate description" });
-    }
-  });
-
-  // AI lifestyle matching
-  app.post("/api/ai/lifestyle-match", async (req, res) => {
-    try {
-      const { preferences } = req.body;
-
-      if (!preferences) {
-        return res.status(400).json({ message: "Preferences are required" });
-      }
-
-      // Get properties and calculate lifestyle scores
-      const properties = await storage.getProperties({ limit: 50 });
-
-      const scoredProperties = properties.map(property => ({
-        ...property,
-        lifestyleMatch: calculateLifestyleMatch(property, preferences)
-      })).sort((a, b) => b.lifestyleMatch - a.lifestyleMatch);
-
-      res.json(scoredProperties.slice(0, 10));
-    } catch (error) {
-      console.error("Error in lifestyle matching:", error);
-      res.status(500).json({ message: "Lifestyle matching service unavailable" });
-    }
-  });
-
-  // 🚀 REVOLUTIONARY CRM ENDPOINTS - Enterprise capabilities beyond OpenAI's basic suggestions!
-
-  // AGENTS - Multi-agent team management
-  app.get("/api/agents", async (req, res) => {
-    try {
-      const { role, teamId, isActive } = req.query;
-      const agents = await storage.getAgents({
-        role: role as string,
-        teamId: teamId ? parseInt(teamId as string) : undefined,
-        isActive: isActive !== undefined ? isActive === 'true' : undefined
-      });
-      res.json(agents);
-    } catch (error) {
-      console.error("Error fetching agents:", error);
-      res.status(500).json({ message: "Failed to fetch agents" });
-    }
-  });
-
-  app.post("/api/agents", async (req, res) => {
-    try {
-      const agent = insertAgentSchema.parse(req.body);
-      const newAgent = await storage.createAgent(agent);
-      res.json(newAgent);
-    } catch (error) {
-      console.error("Error creating agent:", error);
-      res.status(400).json({ message: "Invalid agent data" });
-    }
-  });
-
-  app.get("/api/agents/:id", async (req, res) => {
-    try {
-      const agent = await storage.getAgent(parseInt(req.params.id));
-      if (!agent) {
-        return res.status(404).json({ message: "Agent not found" });
-      }
-      res.json(agent);
-    } catch (error) {
-      console.error("Error fetching agent:", error);
-      res.status(500).json({ message: "Failed to fetch agent" });
-    }
-  });
-
-  app.patch("/api/agents/:id", async (req, res) => {
-    try {
-      const updatedAgent = await storage.updateAgent(parseInt(req.params.id), req.body);
-      res.json(updatedAgent);
-    } catch (error) {
-      console.error("Error updating agent:", error);
-      res.status(500).json({ message: "Failed to update agent" });
-    }
-  });
-
-  // APPOINTMENTS - Advanced scheduling system
-  app.get("/api/appointments", async (req, res) => {
-    try {
-      const { agentId, leadId, propertyId, type, status, dateFrom, dateTo } = req.query;
-      const appointments = await storage.getAppointments({
-        agentId: agentId ? parseInt(agentId as string) : undefined,
-        leadId: leadId ? parseInt(leadId as string) : undefined,
-        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
-        type: type as string,
-        status: status as string,
-        dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
-        dateTo: dateTo ? new Date(dateTo as string) : undefined
-      });
-      res.json(appointments);
-    } catch (error) {
-      console.error("Error fetching appointments:", error);
-      res.status(500).json({ message: "Failed to fetch appointments" });
-    }
-  });
-
-  app.post("/api/appointments", async (req, res) => {
-    try {
-      const appointment = insertAppointmentSchema.parse(req.body);
-      const newAppointment = await storage.createAppointment(appointment);
-      res.json(newAppointment);
-    } catch (error) {
-      console.error("Error creating appointment:", error);
-      res.status(400).json({ message: "Invalid appointment data" });
-    }
-  });
-
-  app.patch("/api/appointments/:id", async (req, res) => {
-    try {
-      const updatedAppointment = await storage.updateAppointment(parseInt(req.params.id), req.body);
-      res.json(updatedAppointment);
-    } catch (error) {
-      console.error("Error updating appointment:", error);
-      res.status(500).json({ message: "Failed to update appointment" });
-    }
-  });
-
-  // CONTRACTS - Digital offer management
-  app.get("/api/contracts", async (req, res) => {
-    try {
-      const { agentId, propertyId, status, type } = req.query;
-      const contracts = await storage.getContracts({
-        agentId: agentId ? parseInt(agentId as string) : undefined,
-        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
-        status: status as string,
-        type: type as string
-      });
-      res.json(contracts);
-    } catch (error) {
-      console.error("Error fetching contracts:", error);
-      res.status(500).json({ message: "Failed to fetch contracts" });
-    }
-  });
-
-  app.post("/api/contracts", async (req, res) => {
-    try {
-      const contract = insertContractSchema.parse(req.body);
-      const newContract = await storage.createContract(contract);
-      res.json(newContract);
-    } catch (error) {
-      console.error("Error creating contract:", error);
-      res.status(400).json({ message: "Invalid contract data" });
-    }
-  });
-
-  app.patch("/api/contracts/:id", async (req, res) => {
-    try {
-      const updatedContract = await storage.updateContract(parseInt(req.params.id), req.body);
-      res.json(updatedContract);
-    } catch (error) {
-      console.error("Error updating contract:", error);
-      res.status(500).json({ message: "Failed to update contract" });
-    }
-  });
-
-  // COMMISSIONS - Financial tracking
-  app.get("/api/commissions", async (req, res) => {
-    try {
-      const { agentId, status } = req.query;
-      const commissions = await storage.getCommissions({
-        agentId: agentId ? parseInt(agentId as string) : undefined,
-        status: status as string
-      });
-      res.json(commissions);
-    } catch (error) {
-      console.error("Error fetching commissions:", error);
-      res.status(500).json({ message: "Failed to fetch commissions" });
-    }
-  });
-
-  app.post("/api/commissions", async (req, res) => {
-    try {
-      const commission = insertCommissionSchema.parse(req.body);
-      const newCommission = await storage.createCommission(commission);
-      res.json(newCommission);
-    } catch (error) {
-      console.error("Error creating commission:", error);
-      res.status(400).json({ message: "Invalid commission data" });
-    }
-  });
-
-  // MARKETING CAMPAIGNS - Automated marketing
-  app.get("/api/marketing-campaigns", async (req, res) => {
-    try {
-      const { agentId, status, type } = req.query;
-      const campaigns = await storage.getMarketingCampaigns({
-        agentId: agentId ? parseInt(agentId as string) : undefined,
-        status: status as string,
-        type: type as string
-      });
-      res.json(campaigns);
-    } catch (error) {
-      console.error("Error fetching marketing campaigns:", error);
-      res.status(500).json({ message: "Failed to fetch marketing campaigns" });
-    }
-  });
-
-  app.post("/api/marketing-campaigns", async (req, res) => {
-    try {
-      const campaign = insertMarketingCampaignSchema.parse(req.body);
-      const newCampaign = await storage.createMarketingCampaign(campaign);
-      res.json(newCampaign);
-    } catch (error) {
-      console.error("Error creating marketing campaign:", error);
-      res.status(400).json({ message: "Invalid campaign data" });
-    }
-  });
-
-  app.patch("/api/marketing-campaigns/:id", async (req, res) => {
-    try {
-      const updatedCampaign = await storage.updateMarketingCampaign(parseInt(req.params.id), req.body);
-      res.json(updatedCampaign);
-    } catch (error) {
-      console.error("Error updating marketing campaign:", error);
-      res.status(500).json({ message: "Failed to update marketing campaign" });
-    }
-  });
-
-  // ADVANCED LEADS ENDPOINT - Enhanced filtering
   app.get("/api/leads", async (req, res) => {
     try {
-      const { status, priority, buyerType, timeframe, minBudget, maxBudget, tags, agentId, limit, offset } = req.query;
-      const leads = await storage.getLeads({
-        status: status as string,
-        priority: priority ? parseInt(priority as string) : undefined,
-        buyerType: buyerType as string,
-        timeframe: timeframe as string,
-        minBudget: minBudget ? parseFloat(minBudget as string) : undefined,
-        maxBudget: maxBudget ? parseFloat(maxBudget as string) : undefined,
-        tags: tags ? (tags as string).split(',') : undefined,
-        agentId: agentId ? parseInt(agentId as string) : undefined,
-        limit: limit ? parseInt(limit as string) : undefined,
-        offset: offset ? parseInt(offset as string) : undefined
-      });
+      const leads = await storage.getLeads();
       res.json(leads);
     } catch (error) {
       console.error("Error fetching leads:", error);
@@ -460,497 +103,499 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // ANALYTICS - Agent performance dashboard
-  app.get("/api/analytics/agent-performance/:agentId", async (req, res) => {
+  // Property Inquiries API
+  app.post("/api/property-inquiries", async (req, res) => {
     try {
-      const agentId = parseInt(req.params.agentId);
-      const { dateFrom, dateTo } = req.query;
-
-      const performance = await storage.getAgentPerformance(
-        agentId,
-        dateFrom ? new Date(dateFrom as string) : undefined,
-        dateTo ? new Date(dateTo as string) : undefined
-      );
-
-      res.json(performance);
+      const inquiry = insertPropertyInquirySchema.parse(req.body);
+      const newInquiry = await storage.createPropertyInquiry(inquiry);
+      res.status(201).json(newInquiry);
     } catch (error) {
-      console.error("Error fetching agent performance:", error);
-      res.status(500).json({ message: "Failed to fetch agent performance" });
+      console.error("Error creating property inquiry:", error);
+      res.status(500).json({ message: "Failed to create property inquiry" });
     }
   });
 
-  // ADVANCED SEARCH - Multi-entity search
-  app.get("/api/search/leads", async (req, res) => {
+  // Chat Conversations API
+  app.post("/api/chat-conversations", async (req, res) => {
     try {
-      const { q } = req.query;
-      if (!q) {
-        return res.status(400).json({ message: "Search query is required" });
+      const conversation = insertChatConversationSchema.parse(req.body);
+      const newConversation = await storage.createChatConversation(conversation);
+      res.status(201).json(newConversation);
+    } catch (error) {
+      console.error("Error creating chat conversation:", error);
+      res.status(500).json({ message: "Failed to create chat conversation" });
+    }
+  });
+
+  // AI Chat API
+  app.post("/api/chat", async (req, res) => {
+    try {
+      const { message, conversationId, propertyId } = req.body;
+      
+      if (!message) {
+        return res.status(400).json({ message: "Message is required" });
       }
 
-      const leads = await storage.searchLeads(q as string);
-      res.json(leads);
-    } catch (error) {
-      console.error("Error searching leads:", error);
-      res.status(500).json({ message: "Search failed" });
-    }
-  });
+      const conversation = conversationId ? 
+        await storage.getChatConversation(conversationId) : null;
 
-  // Hawaii State Parcel Data Integration - Official Government Source
-  app.get("/api/hawaii-parcels/luxury", async (req, res) => {
-    try {
-      const { minValue = 2000000 } = req.query;
-      const luxuryParcels = await hawaiiParcelService.getLuxuryParcels(Number(minValue));
-      res.json(luxuryParcels);
-    } catch (error) {
-      console.error("Error fetching luxury parcels:", error);
-      res.status(500).json({ error: "Failed to fetch luxury parcel data" });
-    }
-  });
-
-  app.get("/api/hawaii-parcels/by-bounds", async (req, res) => {
-    try {
-      const { minLat, maxLat, minLng, maxLng, county } = req.query;
-
-      if (!minLat || !maxLat || !minLng || !maxLng) {
-        return res.status(400).json({ error: "Missing required boundary parameters" });
-      }
-
-      const parcels = await hawaiiParcelService.getParcelsByBounds(
-        Number(minLat),
-        Number(maxLat), 
-        Number(minLng),
-        Number(maxLng),
-        county ? String(county) : undefined
-      );
-
-      res.json(parcels);
-    } catch (error) {
-      console.error("Error fetching parcels by bounds:", error);
-      res.status(500).json({ error: "Failed to fetch parcel data" });
-    }
-  });
-
-  app.get("/api/hawaii-parcels/tmk/:tmk", async (req, res) => {
-    try {
-      const { tmk } = req.params;
-      const parcel = await hawaiiParcelService.getParcelByTMK(tmk);
-
-      if (!parcel) {
-        return res.status(404).json({ error: "Parcel not found" });
-      }
-
-      res.json(parcel);
-    } catch (error) {
-      console.error("Error fetching parcel by TMK:", error);
-      res.status(500).json({ error: "Failed to fetch parcel data" });
-    }
-  });
-
-  app.post("/api/hawaii-parcels/enrich-property", async (req, res) => {
-    try {
-      const { lat, lng, radius = 0.001 } = req.body;
-
-      if (!lat || !lng) {
-        return res.status(400).json({ error: "Missing latitude or longitude" });
-      }
-
-      const enrichmentData = await hawaiiParcelService.enrichPropertyWithParcelData(
-        Number(lat),
-        Number(lng),
-        Number(radius)
-      );
-
-      res.json(enrichmentData);
-    } catch (error) {
-      console.error("Error enriching property with parcel data:", error);
-      res.status(500).json({ error: "Failed to enrich property data" });
-    }
-  });
-
-  // HiCentral MLS Integration - Real Hawaii MLS Data
-  app.get("/api/mls/luxury", async (req, res) => {
-    try {
-      const { minPrice = 1500000 } = req.query;
-      const listings = await hiCentralMLSService.getLuxuryListings(Number(minPrice));
-      res.json(listings);
-    } catch (error) {
-      console.error("Error fetching luxury MLS listings:", error);
-      res.status(500).json({ error: "Failed to fetch MLS data" });
-    }
-  });
-
-  app.get("/api/mls/search", async (req, res) => {
-    try {
-      const filters = {
-        minPrice: req.query.minPrice ? Number(req.query.minPrice) : undefined,
-        maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
-        propertyType: req.query.propertyType as string,
-        neighborhood: req.query.neighborhood as string,
-        bedrooms: req.query.bedrooms ? Number(req.query.bedrooms) : undefined,
-        bathrooms: req.query.bathrooms ? Number(req.query.bathrooms) : undefined,
-        minSqft: req.query.minSqft ? Number(req.query.minSqft) : undefined,
-        maxSqft: req.query.maxSqft ? Number(req.query.maxSqft) : undefined,
-        oceanView: req.query.oceanView === 'true',
-        status: req.query.status as string,
-        limit: req.query.limit ? Number(req.query.limit) : 20,
-        offset: req.query.offset ? Number(req.query.offset) : 0,
-      };
-
-      const listings = await hiCentralMLSService.searchProperties(filters);
-      res.json(listings);
-    } catch (error) {
-      console.error("Error searching MLS listings:", error);
-      res.status(500).json({ error: "Failed to search MLS data" });
-    }
-  });
-
-  app.get("/api/mls/property/:mlsNumber", async (req, res) => {
-    try {
-      const { mlsNumber } = req.params;
-      const listing = await hiCentralMLSService.getPropertyByMLS(mlsNumber);
-
-      if (!listing) {
-        return res.status(404).json({ error: "MLS listing not found" });
-      }
-
-      res.json(listing);
-    } catch (error) {
-      console.error("Error fetching MLS property:", error);
-      res.status(500).json({ error: "Failed to fetch MLS property" });
-    }
-  });
-
-  app.get("/api/mls/nearby", async (req, res) => {
-    try {
-      const { lat, lng, radius = 5 } = req.query;
-
-      if (!lat || !lng) {
-        return res.status(400).json({ error: "Missing latitude or longitude" });
-      }
-
-      const listings = await hiCentralMLSService.getPropertiesInRadius(
-        Number(lat),
-        Number(lng),
-        Number(radius)
-      );
-
-      res.json(listings);
-    } catch (error) {
-      console.error("Error fetching nearby MLS properties:", error);
-      res.status(500).json({ error: "Failed to fetch nearby MLS properties" });
-    }
-  });
-
-  app.get("/api/mls/open-houses", async (req, res) => {
-    try {
-      const openHouses = await hiCentralMLSService.getOpenHouses();
-      res.json(openHouses);
-    } catch (error) {
-      console.error("Error fetching open houses:", error);
-      res.status(500).json({ error: "Failed to fetch open houses" });
-    }
-  });
-
-  app.get("/api/mls/market-stats/:neighborhood", async (req, res) => {
-    try {
-      const { neighborhood } = req.params;
-      const stats = await hiCentralMLSService.getMarketStats(neighborhood);
-      res.json(stats);
-    } catch (error) {
-      console.error("Error fetching market stats:", error);
-      res.status(500).json({ error: "Failed to fetch market statistics" });
-    }
-  });
-
-  app.get("/api/mls/photos/:mlsNumber", async (req, res) => {
-    try {
-      const { mlsNumber } = req.params;
-      const listing = await hiCentralMLSService.getPropertyByMLS(mlsNumber);
-
-      if (!listing) {
-        return res.status(404).json({ error: "MLS listing not found" });
-      }
-
-      res.json({
-        mlsNumber: listing.mlsNumber,
-        address: listing.address,
-        photos: listing.photos,
-        totalPhotos: listing.photos.length,
-        listPrice: listing.listPrice,
-        propertyType: listing.propertyType
-      });
-    } catch (error) {
-      console.error("Error fetching MLS photos:", error);
-      res.status(500).json({ error: "Failed to fetch MLS photos" });
-    }
-  });
-
-  // HOME VALUATION ENDPOINTS - Real-time market value calculator
-  app.post("/api/home-valuation", async (req, res) => {
-    try {
-      const {
-        firstName,
-        lastName,
-        email,
-        phone,
-        address,
-        city,
-        zipCode = "96815",
-        propertyType,
-        squareFeet,
-        bedrooms,
-        bathrooms,
-        yearBuilt,
-        lotSize,
-        condition,
-        amenities = [],
-        upgrades = []
-      } = req.body;
-
-      // Validate required fields
-      if (!firstName || !lastName || !email || !address || !city || !squareFeet || !bedrooms || !bathrooms || !propertyType || !condition) {
-        return res.status(400).json({ 
-          message: "Missing required fields for home valuation" 
-        });
-      }
-
-      // Calculate market valuation using authentic Hawaii MLS data
-      const propertyDetails = {
-        address,
-        city,
-        zipCode,
-        squareFeet: parseInt(squareFeet),
-        bedrooms: parseInt(bedrooms),
-        bathrooms: parseFloat(bathrooms),
-        yearBuilt: yearBuilt ? parseInt(yearBuilt) : undefined,
-        propertyType,
-        condition,
-        lotSize: lotSize ? parseFloat(lotSize) : undefined,
-        amenities,
-        upgrades
-      };
-
-      const marketValuation = await marketValuePredictor.calculateMarketValue(propertyDetails);
-
-      // Save to CRM
-      const { leadId, valuationId } = await marketValuePredictor.saveHomeValuationRequest({
-        firstName,
-        lastName,
-        email,
-        phone,
-        ...propertyDetails
-      }, marketValuation);
-
-      res.json({
-        success: true,
-        valuation: marketValuation,
-        leadId,
-        valuationId,
-        message: "Market valuation completed using authentic Hawaii MLS data"
-      });
-
-    } catch (error) {
-      console.error("Error calculating home valuation:", error);
-      res.status(500).json({ 
-        message: "Failed to calculate home valuation",
-        error: error.message
-      });
-    }
-  });
-
-  app.get("/api/home-valuations", async (req, res) => {
-    try {
-      const { leadId } = req.query;
-      const valuations = await storage.getHomeValuations(
-        leadId ? parseInt(leadId as string) : undefined
-      );
-      res.json(valuations);
-    } catch (error) {
-      console.error("Error fetching home valuations:", error);
-      res.status(500).json({ message: "Failed to fetch home valuations" });
-    }
-  });
-
-  app.get("/api/home-valuations/:id", async (req, res) => {
-    try {
-      const valuation = await storage.getHomeValuation(parseInt(req.params.id));
-      if (!valuation) {
-        return res.status(404).json({ message: "Home valuation not found" });
-      }
-      res.json(valuation);
-    } catch (error) {
-      console.error("Error fetching home valuation:", error);
-      res.status(500).json({ message: "Failed to fetch home valuation" });
-    }
-  });
-
-  // MLS Scraper Management Endpoints
-  app.post("/api/scraper/sync", async (req, res) => {
-    try {
-      console.log('🔄 Manual MLS sync triggered...');
-      await mlsScraperService.scrapeNewListings();
+      const aiResponse = await generateAIResponse(message, conversation);
+      
       res.json({ 
-        success: true, 
-        message: "MLS sync completed successfully" 
+        response: aiResponse,
+        conversationId: conversation?.id || null
       });
     } catch (error) {
-      console.error("Error during manual MLS sync:", error);
-      res.status(500).json({ error: "Failed to sync MLS data" });
+      console.error("Error in AI chat:", error);
+      res.status(500).json({ message: "Failed to process chat message" });
     }
   });
 
-  app.get("/api/scraper/status", async (req, res) => {
+  // HiCentral Scraper API endpoints
+  app.post("/api/hicentral/sync", async (req, res) => {
     try {
-      const status = mlsScraperService.getScraperStatus();
-      res.json(status);
+      const { hicentralScraper } = await import("./lib/hicentral-scraper");
+      await hicentralScraper.syncProperties();
+      res.json({ message: "HiCentral sync completed successfully" });
     } catch (error) {
-      console.error("Error fetching scraper status:", error);
-      res.status(500).json({ error: "Failed to fetch scraper status" });
+      console.error("Error syncing HiCentral properties:", error);
+      res.status(500).json({ message: "Failed to sync HiCentral properties" });
     }
   });
 
-  // Start automatic MLS scraping on server startup
-  mlsScraperService.startAutoScraping();
+  app.get("/api/hicentral/status", async (req, res) => {
+    try {
+      const { hicentralScraper } = await import("./lib/hicentral-scraper");
+      const lastSync = await hicentralScraper.getLastSync();
+      res.json({
+        status: "active",
+        schedule: "Every hour",
+        source: "HiCentral MLS",
+        lastSync: lastSync || new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Error getting HiCentral status:", error);
+      res.status(500).json({ message: "Failed to get HiCentral status" });
+    }
+  });
 
-  const httpServer = createServer(app);
-  return httpServer;
+  // ========================================
+  // ADVANCED CRM AUTOMATION & WORKFLOW ENDPOINTS
+  // ========================================
+
+  // Task Management & Follow-ups
+  app.get("/api/tasks", async (req, res) => {
+    try {
+      const { leadId, agentId, propertyId, type, priority, status, automated, dueDateFrom, dueDateTo } = req.query;
+      const tasks = await storage.getTasks({
+        leadId: leadId ? parseInt(leadId as string) : undefined,
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        propertyId: propertyId ? parseInt(propertyId as string) : undefined,
+        type: type as string,
+        priority: priority as string,
+        status: status as string,
+        automated: automated === 'true' ? true : automated === 'false' ? false : undefined,
+        dueDateFrom: dueDateFrom ? new Date(dueDateFrom as string) : undefined,
+        dueDateTo: dueDateTo ? new Date(dueDateTo as string) : undefined,
+      });
+      res.json(tasks);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      res.status(500).json({ message: "Failed to fetch tasks" });
+    }
+  });
+
+  app.post("/api/tasks", async (req, res) => {
+    try {
+      const task = insertTaskSchema.parse(req.body);
+      const newTask = await storage.createTask(task);
+      res.status(201).json(newTask);
+    } catch (error) {
+      console.error("Error creating task:", error);
+      res.status(500).json({ message: "Failed to create task" });
+    }
+  });
+
+  app.put("/api/tasks/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const task = await storage.updateTask(id, req.body);
+      res.json(task);
+    } catch (error) {
+      console.error("Error updating task:", error);
+      res.status(500).json({ message: "Failed to update task" });
+    }
+  });
+
+  app.post("/api/tasks/:id/complete", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { notes } = req.body;
+      const task = await storage.completeTask(id, notes);
+      res.json(task);
+    } catch (error) {
+      console.error("Error completing task:", error);
+      res.status(500).json({ message: "Failed to complete task" });
+    }
+  });
+
+  // Communication Tracking (Email, SMS, Calls)
+  app.get("/api/communications", async (req, res) => {
+    try {
+      const { leadId, agentId, type, direction, status, dateFrom, dateTo } = req.query;
+      const communications = await storage.getCommunications({
+        leadId: leadId ? parseInt(leadId as string) : undefined,
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        type: type as string,
+        direction: direction as string,
+        status: status as string,
+        dateFrom: dateFrom ? new Date(dateFrom as string) : undefined,
+        dateTo: dateTo ? new Date(dateTo as string) : undefined,
+      });
+      res.json(communications);
+    } catch (error) {
+      console.error("Error fetching communications:", error);
+      res.status(500).json({ message: "Failed to fetch communications" });
+    }
+  });
+
+  app.post("/api/communications", async (req, res) => {
+    try {
+      const communication = insertCommunicationSchema.parse(req.body);
+      const newCommunication = await storage.createCommunication(communication);
+      res.status(201).json(newCommunication);
+    } catch (error) {
+      console.error("Error creating communication:", error);
+      res.status(500).json({ message: "Failed to create communication" });
+    }
+  });
+
+  app.post("/api/communications/:id/track", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const { event } = req.body; // 'opened', 'clicked', 'replied'
+      const communication = await storage.trackCommunicationEvent(id, event);
+      res.json(communication);
+    } catch (error) {
+      console.error("Error tracking communication event:", error);
+      res.status(500).json({ message: "Failed to track communication event" });
+    }
+  });
+
+  // Message Templates for Automation
+  app.get("/api/message-templates", async (req, res) => {
+    try {
+      const { agentId, type, category, isActive } = req.query;
+      const templates = await storage.getMessageTemplates({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        type: type as string,
+        category: category as string,
+        isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+      });
+      res.json(templates);
+    } catch (error) {
+      console.error("Error fetching message templates:", error);
+      res.status(500).json({ message: "Failed to fetch message templates" });
+    }
+  });
+
+  app.post("/api/message-templates", async (req, res) => {
+    try {
+      const template = insertMessageTemplateSchema.parse(req.body);
+      const newTemplate = await storage.createMessageTemplate(template);
+      res.status(201).json(newTemplate);
+    } catch (error) {
+      console.error("Error creating message template:", error);
+      res.status(500).json({ message: "Failed to create message template" });
+    }
+  });
+
+  app.put("/api/message-templates/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const template = await storage.updateMessageTemplate(id, req.body);
+      res.json(template);
+    } catch (error) {
+      console.error("Error updating message template:", error);
+      res.status(500).json({ message: "Failed to update message template" });
+    }
+  });
+
+  // Automation Rules & Triggers
+  app.get("/api/automation-rules", async (req, res) => {
+    try {
+      const { agentId, triggerType, actionType, isActive } = req.query;
+      const rules = await storage.getAutomationRules({
+        agentId: agentId ? parseInt(agentId as string) : undefined,
+        triggerType: triggerType as string,
+        actionType: actionType as string,
+        isActive: isActive === 'true' ? true : isActive === 'false' ? false : undefined,
+      });
+      res.json(rules);
+    } catch (error) {
+      console.error("Error fetching automation rules:", error);
+      res.status(500).json({ message: "Failed to fetch automation rules" });
+    }
+  });
+
+  app.post("/api/automation-rules", async (req, res) => {
+    try {
+      const rule = insertAutomationRuleSchema.parse(req.body);
+      const newRule = await storage.createAutomationRule(rule);
+      res.status(201).json(newRule);
+    } catch (error) {
+      console.error("Error creating automation rule:", error);
+      res.status(500).json({ message: "Failed to create automation rule" });
+    }
+  });
+
+  app.put("/api/automation-rules/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const rule = await storage.updateAutomationRule(id, req.body);
+      res.json(rule);
+    } catch (error) {
+      console.error("Error updating automation rule:", error);
+      res.status(500).json({ message: "Failed to update automation rule" });
+    }
+  });
+
+  app.post("/api/automation-rules/:ruleId/execute", async (req, res) => {
+    try {
+      const ruleId = parseInt(req.params.ruleId);
+      const { leadId } = req.body;
+      await storage.executeAutomationRule(ruleId, leadId);
+      res.json({ message: "Automation rule executed successfully" });
+    } catch (error) {
+      console.error("Error executing automation rule:", error);
+      res.status(500).json({ message: "Failed to execute automation rule" });
+    }
+  });
+
+  // Lead Activity Tracking
+  app.post("/api/lead-activities", async (req, res) => {
+    try {
+      const activity = insertLeadActivitySchema.parse(req.body);
+      const newActivity = await storage.trackLeadActivity(activity);
+      res.status(201).json(newActivity);
+    } catch (error) {
+      console.error("Error tracking lead activity:", error);
+      res.status(500).json({ message: "Failed to track lead activity" });
+    }
+  });
+
+  app.get("/api/leads/:leadId/activities", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+      const activities = await storage.getLeadActivities(leadId, limit);
+      res.json(activities);
+    } catch (error) {
+      console.error("Error fetching lead activities:", error);
+      res.status(500).json({ message: "Failed to fetch lead activities" });
+    }
+  });
+
+  app.get("/api/leads/:leadId/activity-summary", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const summary = await storage.getLeadActivitySummary(leadId);
+      res.json(summary);
+    } catch (error) {
+      console.error("Error fetching lead activity summary:", error);
+      res.status(500).json({ message: "Failed to fetch lead activity summary" });
+    }
+  });
+
+  // Property Favorites & Saved Searches
+  app.get("/api/leads/:leadId/favorites", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const favorites = await storage.getFavoriteProperties(leadId);
+      res.json(favorites);
+    } catch (error) {
+      console.error("Error fetching favorite properties:", error);
+      res.status(500).json({ message: "Failed to fetch favorite properties" });
+    }
+  });
+
+  app.post("/api/leads/:leadId/favorites", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const { propertyId, notes } = req.body;
+      const favorite = await storage.addPropertyToFavorites(leadId, propertyId, notes);
+      res.status(201).json(favorite);
+    } catch (error) {
+      console.error("Error adding property to favorites:", error);
+      res.status(500).json({ message: "Failed to add property to favorites" });
+    }
+  });
+
+  app.delete("/api/leads/:leadId/favorites/:propertyId", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const propertyId = parseInt(req.params.propertyId);
+      await storage.removePropertyFromFavorites(leadId, propertyId);
+      res.json({ message: "Property removed from favorites" });
+    } catch (error) {
+      console.error("Error removing property from favorites:", error);
+      res.status(500).json({ message: "Failed to remove property from favorites" });
+    }
+  });
+
+  app.get("/api/leads/:leadId/saved-searches", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const searches = await storage.getSavedSearches(leadId);
+      res.json(searches);
+    } catch (error) {
+      console.error("Error fetching saved searches:", error);
+      res.status(500).json({ message: "Failed to fetch saved searches" });
+    }
+  });
+
+  app.post("/api/leads/:leadId/saved-searches", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const search = insertSavedSearchSchema.parse({ ...req.body, leadId });
+      const newSearch = await storage.createSavedSearch(search);
+      res.status(201).json(newSearch);
+    } catch (error) {
+      console.error("Error creating saved search:", error);
+      res.status(500).json({ message: "Failed to create saved search" });
+    }
+  });
+
+  app.put("/api/saved-searches/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const search = await storage.updateSavedSearch(id, req.body);
+      res.json(search);
+    } catch (error) {
+      console.error("Error updating saved search:", error);
+      res.status(500).json({ message: "Failed to update saved search" });
+    }
+  });
+
+  app.delete("/api/saved-searches/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      await storage.deleteSavedSearch(id);
+      res.json({ message: "Saved search deleted" });
+    } catch (error) {
+      console.error("Error deleting saved search:", error);
+      res.status(500).json({ message: "Failed to delete saved search" });
+    }
+  });
+
+  // Advanced Behavioral Triggers & Lead Intelligence
+  app.get("/api/leads/inactive", async (req, res) => {
+    try {
+      const days = req.query.days ? parseInt(req.query.days as string) : 7;
+      const inactiveLeads = await storage.checkInactiveLeads(days);
+      res.json(inactiveLeads);
+    } catch (error) {
+      console.error("Error fetching inactive leads:", error);
+      res.status(500).json({ message: "Failed to fetch inactive leads" });
+    }
+  });
+
+  app.get("/api/leads/high-engagement", async (req, res) => {
+    try {
+      const threshold = req.query.threshold ? parseInt(req.query.threshold as string) : 5;
+      const highEngagementLeads = await storage.getHighEngagementLeads(threshold);
+      res.json(highEngagementLeads);
+    } catch (error) {
+      console.error("Error fetching high engagement leads:", error);
+      res.status(500).json({ message: "Failed to fetch high engagement leads" });
+    }
+  });
+
+  app.get("/api/leads/recent-activity", async (req, res) => {
+    try {
+      const hours = req.query.hours ? parseInt(req.query.hours as string) : 24;
+      const recentLeads = await storage.getLeadsByLastActivity(hours);
+      res.json(recentLeads);
+    } catch (error) {
+      console.error("Error fetching leads with recent activity:", error);
+      res.status(500).json({ message: "Failed to fetch leads with recent activity" });
+    }
+  });
+
+  app.get("/api/leads/hot-leads", async (req, res) => {
+    try {
+      const hotLeads = await storage.identifyHotLeads();
+      res.json(hotLeads);
+    } catch (error) {
+      console.error("Error fetching hot leads:", error);
+      res.status(500).json({ message: "Failed to fetch hot leads" });
+    }
+  });
+
+  app.get("/api/leads/:leadId/score", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const score = await storage.calculateLeadScore(leadId);
+      res.json({ leadId, score });
+    } catch (error) {
+      console.error("Error calculating lead score:", error);
+      res.status(500).json({ message: "Failed to calculate lead score" });
+    }
+  });
+
+  // Communication Automation
+  app.post("/api/leads/:leadId/send-automated-message", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const { templateId, variables } = req.body;
+      const communication = await storage.sendAutomatedMessage(leadId, templateId, variables);
+      res.status(201).json(communication);
+    } catch (error) {
+      console.error("Error sending automated message:", error);
+      res.status(500).json({ message: "Failed to send automated message" });
+    }
+  });
+
+  app.post("/api/leads/:leadId/schedule-follow-up", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const { agentId, delayMinutes, taskType } = req.body;
+      const task = await storage.scheduleFollowUp(leadId, agentId, delayMinutes, taskType);
+      res.status(201).json(task);
+    } catch (error) {
+      console.error("Error scheduling follow-up:", error);
+      res.status(500).json({ message: "Failed to schedule follow-up" });
+    }
+  });
+
+  app.post("/api/leads/:leadId/trigger-drip-campaign", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      const { campaignType } = req.body;
+      await storage.triggerDripCampaign(leadId, campaignType);
+      res.json({ message: "Drip campaign triggered successfully" });
+    } catch (error) {
+      console.error("Error triggering drip campaign:", error);
+      res.status(500).json({ message: "Failed to trigger drip campaign" });
+    }
+  });
+
+  app.post("/api/leads/:leadId/check-triggers", async (req, res) => {
+    try {
+      const leadId = parseInt(req.params.leadId);
+      await storage.checkAutomationTriggers(leadId);
+      res.json({ message: "Automation triggers checked successfully" });
+    } catch (error) {
+      console.error("Error checking automation triggers:", error);
+      res.status(500).json({ message: "Failed to check automation triggers" });
+    }
+  });
+
+  // Return the app configured with routes - server startup handled by index.ts
+  return app as any;
 }
 
-// Helper functions
 async function generateAIResponse(message: string, conversation: any): Promise<string> {
-  // Simplified AI response - in production, integrate with OpenAI API
-  const responses = [
-    "I'd be happy to help you find the perfect property! Could you tell me more about your preferences?",
-    "Based on your requirements, I found several properties that might interest you. Would you like to see them?",
-    "That's a great question! Let me provide you with detailed information about that property.",
-    "I can schedule a virtual tour or in-person viewing for you. What would you prefer?",
-    "The estimated ROI for that property is quite attractive. Would you like a detailed financial analysis?",
-  ];
-
-  return responses[Math.floor(Math.random() * responses.length)];
-}
-
-function calculateLifestyleMatch(property: any, preferences: any): number | null {
-  // Only calculate if user has provided authentic preferences
-  if (!preferences || Object.keys(preferences).length === 0) {
-    return null; // No lifestyle match without real user preferences
-  }
-
-  let score = 0;
-  let factors = 0;
-
-  // Location preferences
-  if (preferences.oceanView && property.amenities?.includes('Ocean View')) {
-    score += 25;
-    factors++;
-  }
-
-  // Property type matching
-  if (preferences.propertyType && property.propertyType === preferences.propertyType) {
-    score += 20;
-    factors++;
-  }
-
-  // Size requirements
-  if (preferences.familySize) {
-    const familySize = parseInt(preferences.familySize.split('-')[0]);
-    if (property.bedrooms >= familySize) {
-      score += 15;
-    }
-    factors++;
-  }
-
-  // Lifestyle amenities
-  if (preferences.lifestyle?.remoteWork && property.amenities?.includes('Home Office')) {
-    score += 20;
-    factors++;
-  }
-  if (preferences.lifestyle?.oceanActivities && property.amenities?.includes('Beach Access')) {
-    score += 20;
-    factors++;
-  }  if (preferences.lifestyle?.privacy && property.propertyType === 'estate') {
-    score += 15;
-    factors++;
-  }
-
-  return factors > 0 ? Math.min(Math.round(score / factors * 4), 100) : null;
-}
-
-  // Open House API endpoints
-  app.get("/api/open-houses", async (req, res) => {
-  try {
-    const { active, upcoming } = req.query;
-    const filters = {
-      active: active ? active === 'true' : true,
-      upcoming: upcoming === 'true'
-    };
-    
-    const openHouses = await storage.getOpenHouses(filters);
-    res.json(openHouses);
-  } catch (error) {
-    console.error("Error fetching open houses:", error);
-    res.status(500).json({ message: "Failed to fetch open houses" });
-  }
-});
-
-app.post("/api/open-houses", async (req, res) => {
-  try {
-    const openHouse = await storage.createOpenHouse(req.body);
-    res.status(201).json(openHouse);
-  } catch (error) {
-    console.error("Error creating open house:", error);
-    res.status(500).json({ message: "Failed to create open house" });
-  }
-});
-
-app.patch("/api/open-houses/:id", async (req, res) => {
-  try {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-      return res.status(400).json({ message: "Invalid open house ID" });
-    }
-    
-    const openHouse = await storage.updateOpenHouse(id, req.body);
-    res.json(openHouse);
-  } catch (error) {
-    console.error("Error updating open house:", error);
-    res.status(500).json({ message: "Failed to update open house" });
-  }
-});
-
-// Trigger manual open house update
-app.post("/api/open-houses/sync", async (req, res) => {
-  try {
-    const { openHouseScraper } = await import("./lib/open-house-scraper");
-    await openHouseScraper.updateOpenHouses();
-    res.json({ message: "Open house sync completed" });
-  } catch (error) {
-    console.error("Error syncing open houses:", error);
-    res.status(500).json({ message: "Failed to sync open houses" });
-  }
-});
-
-// Get open house scraper status
-app.get("/api/open-houses/status", async (req, res) => {
-  try {
-    const { openHouseScraper } = await import("./lib/open-house-scraper");
-    const activeOpenHouses = await openHouseScraper.getActiveOpenHouses();
-    res.json({
-      status: "active",
-      schedule: "Every Friday at 3:35 PM HST",
-      source: "Hawaii Board of Realtors",
-      activeOpenHouses: activeOpenHouses.length,
-      lastUpdate: new Date().toISOString()
-    });
-  } catch (error) {
-    console.error("Error getting open house status:", error);
-    res.status(500).json({ message: "Failed to get open house status" });
-  }
-});
-
-  const server = app.listen(PORT, "0.0.0.0", () => {
-    log(`serving on port ${PORT}`, "express");
-  });
-
-  return server;
+  // Basic AI response for now - this would integrate with OpenAI API
+  return `Thank you for your inquiry about "${message}". I'm here to help you find the perfect luxury property in Hawaii. How can I assist you further?`;
 }

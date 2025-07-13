@@ -576,3 +576,205 @@ export type InsertMarketPrediction = z.infer<typeof insertMarketPredictionSchema
 
 export type OpenHouse = typeof openHouses.$inferSelect;
 export type InsertOpenHouse = z.infer<typeof insertOpenHouseSchema>;
+
+// ADVANCED CRM AUTOMATION & WORKFLOW MANAGEMENT
+
+// Task Management & Follow-ups
+export const tasks = pgTable("tasks", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id").references(() => leads.id),
+  agentId: integer("agent_id").references(() => agents.id),
+  propertyId: integer("property_id").references(() => properties.id),
+  title: text("title").notNull(),
+  description: text("description"),
+  type: text("type").notNull(), // 'follow_up', 'call', 'email', 'meeting', 'document', 'showing'
+  priority: text("priority").default("medium"), // 'low', 'medium', 'high', 'urgent'
+  status: text("status").default("pending"), // 'pending', 'in_progress', 'completed', 'cancelled'
+  dueDate: timestamp("due_date"),
+  completedAt: timestamp("completed_at"),
+  automatedTask: boolean("automated_task").default(false),
+  triggerType: text("trigger_type"), // 'time_based', 'lead_activity', 'property_interest', 'manual'
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Communication Tracking (Email, SMS, Calls)
+export const communications = pgTable("communications", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id").references(() => leads.id),
+  agentId: integer("agent_id").references(() => agents.id),
+  type: text("type").notNull(), // 'email', 'sms', 'call', 'meeting', 'note'
+  direction: text("direction").notNull(), // 'inbound', 'outbound'
+  subject: text("subject"),
+  content: text("content").notNull(),
+  status: text("status").default("sent"), // 'sent', 'delivered', 'opened', 'clicked', 'replied'
+  templateId: integer("template_id"),
+  scheduledFor: timestamp("scheduled_for"),
+  sentAt: timestamp("sent_at"),
+  openedAt: timestamp("opened_at"),
+  clickedAt: timestamp("clicked_at"),
+  repliedAt: timestamp("replied_at"),
+  metadata: json("metadata").$type<{
+    emailOpen?: boolean;
+    linkClicks?: number;
+    callDuration?: number;
+    meetingNotes?: string;
+  }>(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Message Templates for Automation
+export const messageTemplates = pgTable("message_templates", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  type: text("type").notNull(), // 'email', 'sms', 'follow_up'
+  subject: text("subject"),
+  content: text("content").notNull(),
+  variables: json("variables").$type<string[]>().default([]), // ["{firstName}", "{propertyAddress}"]
+  category: text("category"), // 'welcome', 'follow_up', 'showing', 'offer', 'closing'
+  agentId: integer("agent_id").references(() => agents.id),
+  isActive: boolean("is_active").default(true),
+  useCount: integer("use_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Automation Rules & Triggers
+export const automationRules = pgTable("automation_rules", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  description: text("description"),
+  triggerType: text("trigger_type").notNull(), // 'lead_created', 'property_viewed', 'inactivity', 'status_change'
+  triggerConditions: json("trigger_conditions").$type<{
+    status?: string;
+    daysSinceLastContact?: number;
+    propertyViewCount?: number;
+    budgetRange?: { min: number; max: number };
+    tags?: string[];
+  }>(),
+  actionType: text("action_type").notNull(), // 'send_email', 'create_task', 'notify_agent', 'update_status'
+  actionConfig: json("action_config").$type<{
+    templateId?: number;
+    taskType?: string;
+    newStatus?: string;
+    agentId?: number;
+    delay?: number; // minutes
+  }>(),
+  isActive: boolean("is_active").default(true),
+  agentId: integer("agent_id").references(() => agents.id),
+  executionCount: integer("execution_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Lead Activity Tracking
+export const leadActivities = pgTable("lead_activities", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id").references(() => leads.id),
+  propertyId: integer("property_id").references(() => properties.id),
+  activityType: text("activity_type").notNull(), // 'property_view', 'search', 'favorite', 'inquiry', 'call', 'email'
+  details: json("details").$type<{
+    searchFilters?: any;
+    timeSpent?: number;
+    pagesViewed?: number;
+    propertyTitle?: string;
+    inquiryType?: string;
+  }>(),
+  sessionId: text("session_id"),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  referrer: text("referrer"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Property Favorites & Saved Searches
+export const propertyFavorites = pgTable("property_favorites", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id").references(() => leads.id),
+  propertyId: integer("property_id").references(() => properties.id),
+  notes: text("notes"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const savedSearches = pgTable("saved_searches", {
+  id: serial("id").primaryKey(),
+  leadId: integer("lead_id").references(() => leads.id),
+  name: text("name").notNull(),
+  criteria: json("criteria").$type<{
+    minPrice?: number;
+    maxPrice?: number;
+    bedrooms?: number;
+    bathrooms?: number;
+    propertyType?: string;
+    city?: string;
+    amenities?: string[];
+  }>(),
+  alertsEnabled: boolean("alerts_enabled").default(true),
+  lastNotified: timestamp("last_notified"),
+  matchCount: integer("match_count").default(0),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// CRM Insert Schemas for new tables
+export const insertTaskSchema = createInsertSchema(tasks).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertCommunicationSchema = createInsertSchema(communications).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertMessageTemplateSchema = createInsertSchema(messageTemplates).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAutomationRuleSchema = createInsertSchema(automationRules).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertLeadActivitySchema = createInsertSchema(leadActivities).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertPropertyFavoriteSchema = createInsertSchema(propertyFavorites).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertSavedSearchSchema = createInsertSchema(savedSearches).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+// ADVANCED CRM TYPES
+export type Task = typeof tasks.$inferSelect;
+export type InsertTask = z.infer<typeof insertTaskSchema>;
+
+export type Communication = typeof communications.$inferSelect;
+export type InsertCommunication = z.infer<typeof insertCommunicationSchema>;
+
+export type MessageTemplate = typeof messageTemplates.$inferSelect;
+export type InsertMessageTemplate = z.infer<typeof insertMessageTemplateSchema>;
+
+export type AutomationRule = typeof automationRules.$inferSelect;
+export type InsertAutomationRule = z.infer<typeof insertAutomationRuleSchema>;
+
+export type LeadActivity = typeof leadActivities.$inferSelect;
+export type InsertLeadActivity = z.infer<typeof insertLeadActivitySchema>;
+
+export type PropertyFavorite = typeof propertyFavorites.$inferSelect;
+export type InsertPropertyFavorite = z.infer<typeof insertPropertyFavoriteSchema>;
+
+export type SavedSearch = typeof savedSearches.$inferSelect;
+export type InsertSavedSearch = z.infer<typeof insertSavedSearchSchema>;

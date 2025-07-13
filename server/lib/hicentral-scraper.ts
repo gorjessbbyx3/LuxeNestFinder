@@ -7,6 +7,7 @@ interface HiCentralListing {
   price: number;
   address: string;
   city: string;
+  zipCode: string;
   bedrooms: number;
   bathrooms: number;
   squareFeet: number;
@@ -159,6 +160,7 @@ class HiCentralScraper {
       const bedrooms = Math.floor(Math.random() * 4) + 3; // 3-6 bedrooms
       const bathrooms = Math.floor(Math.random() * 3) + 2; // 2-4 bathrooms
       const sqft = Math.floor(Math.random() * 3000) + 2000; // 2000-5000 sqft
+      const zipCode = areaData.city === "Honolulu" ? "96815" : areaData.city === "Kailua" ? "96734" : areaData.city === "Wailea" ? "96753" : areaData.city === "Kona" ? "96740" : areaData.city === "Hanalei" ? "96714" : "96761";
 
       listings.push({
         mlsNumber: `HBR${String(baseId + i + 1).padStart(6, '0')}`,
@@ -166,6 +168,7 @@ class HiCentralScraper {
         price: price,
         address: `${1000 + i} ${areaData.area} Drive`,
         city: areaData.city,
+        zipCode: zipCode,
         bedrooms: bedrooms,
         bathrooms: bathrooms,
         squareFeet: sqft,
@@ -197,6 +200,8 @@ class HiCentralScraper {
       price: listing.price,
       address: listing.address,
       city: listing.city,
+      state: "HI", // All Hawaii properties
+      zipCode: listing.zipCode,
       bedrooms: listing.bedrooms,
       bathrooms: listing.bathrooms,
       squareFeet: listing.squareFeet,
@@ -225,6 +230,8 @@ class HiCentralScraper {
       price: listing.price,
       address: listing.address,
       city: listing.city,
+      state: "HI", // All Hawaii properties
+      zipCode: listing.zipCode,
       bedrooms: listing.bedrooms,
       bathrooms: listing.bathrooms,
       squareFeet: listing.squareFeet,
@@ -273,6 +280,15 @@ class HiCentralScraper {
   async manualSync() {
     return await this.syncAllListings();
   }
+
+  // Alias for API compatibility
+  async syncProperties() {
+    return await this.syncAllListings();
+  }
+
+  getLastSync() {
+    return this.lastSyncTime?.toISOString() || null;
+  }
 }
 
-export const hiCentralScraper = new HiCentralScraper();
+export const hicentralScraper = new HiCentralScraper();

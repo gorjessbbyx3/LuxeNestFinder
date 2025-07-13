@@ -1,0 +1,221 @@
+🧭 1. Lead & Contact Management Workflow
+User Action:
+Lead fills out form on website or third-party platform (Zillow, FB Ads, etc.)
+
+Workflow:
+Lead is automatically added to CRM via webhook/API integration.
+
+System:
+
+Assigns source (e.g., Facebook Lead Ads).
+
+Sets status: New.
+
+Auto-tags based on form data (e.g., “First-time buyer”, “Investor”).
+
+CRM:
+
+Notifies agent (email + push).
+
+Auto-schedules a follow-up task.
+
+Agent:
+
+Opens lead profile → adds notes → updates status (Contacted, Hot Lead, etc.)
+
+📅 2. Calendar & Scheduling Workflow
+User Action:
+Agent books a showing or meeting in the CRM.
+
+Workflow:
+Event is added to Google/Outlook calendar via sync.
+
+Client receives:
+
+Confirmation email with date/time/location.
+
+Reminder SMS 24 hours before.
+
+Agent dashboard:
+
+Displays upcoming meetings.
+
+Lists overdue follow-ups or task checklists (e.g., “Send pre-approval reminder”).
+
+🧠 Optional: Let clients self-book via public calendar link (Calendly-style).
+
+🏠 3. Property/Listing Management Workflow
+User Action:
+Agent saves a property for a client or gets a match from MLS feed.
+
+Workflow:
+Property info is pulled from MLS or manually added.
+
+CRM tags which client it’s related to.
+
+Client portal shows saved properties:
+
+Can "favorite", "remove", or "request showing".
+
+Agent sees which homes the client engaged with.
+
+🔁 Trigger behavior: If 3+ favorites in 24 hours → send alert to agent.
+
+💬 4. Communication Workflow (Email, SMS, Notes)
+User Action:
+Agent sends a message or drip email campaign.
+
+Workflow:
+CRM pulls from message template bank.
+
+Client receives:
+
+Email or SMS (tracked for open/click).
+
+CRM updates timeline:
+
+“Follow-up email sent 07/12 at 10:24 AM.”
+
+If no reply in X days → CRM triggers follow-up reminder.
+
+🔁 Drip campaigns auto-trigger based on tags like “Nurture” or “Past Client”.
+
+💰 5. Pipeline / Deal Management Workflow
+User Action:
+Agent moves a client from “Offer Made” → “Under Contract”.
+
+Workflow:
+CRM updates:
+
+Client status.
+
+Transaction timeline.
+
+Estimated close date.
+
+Auto-generated task checklist kicks in:
+
+“Send final inspection notice.”
+
+“Prepare closing gift.”
+
+Deal appears in agent’s pipeline dashboard.
+
+Commission calculation updated based on deal size.
+
+🔐 6. Client Portal Workflow
+User Action:
+Client logs in to view their progress.
+
+Workflow:
+Secure login → show dashboard:
+
+Listings shared
+
+Favorite homes
+
+Uploaded docs (pre-approval, offer, etc.)
+
+Messages
+
+Process timeline (e.g., “Inspection completed”)
+
+Client uploads new docs → agent gets notified.
+
+All activity tracked in timeline.
+
+📊 7. Analytics & Reporting Workflow
+Trigger:
+Admin requests analytics for the week/month.
+
+Workflow:
+CRM compiles:
+
+New leads added
+
+Deals closed
+
+Revenue earned
+
+Avg. time to close
+
+Report sent:
+
+As email PDF
+
+Or visible in dashboard charts
+
+Optional:
+
+Client engagement report (opens, clicks, listings viewed)
+
+Referral tracking per source (ROI-based)
+
+🤖 8. Automation & Smart Follow-Up Workflow
+Trigger:
+Lead goes 5 days without contact.
+
+Workflow:
+CRM detects inactivity.
+
+Sends:
+
+Automated “Just checking in” email or SMS.
+
+Agent receives:
+
+“You haven’t touched Lead X in 5 days” notification.
+
+CRM logs auto message in lead’s timeline.
+
+Lead replies → status auto-updates to “Engaged.”
+
+🖇 9. Integration Workflow (MLS, DocuSign, Stripe, etc.)
+MLS:
+Pulls listings via IDX → updates client portals with matching homes.
+
+DocuSign:
+Agent uploads contract → client signs digitally → signed PDF stored in profile.
+
+Stripe/QuickBooks:
+Client pays retainer → payment logged → receipt emailed → transaction tracked.
+
+🧑‍💼 10. Agent & Admin Dashboard Workflow
+User Action:
+Agent logs in to dashboard.
+
+Workflow:
+CRM loads:
+
+Today’s tasks
+
+Active deals
+
+Overdue leads
+
+Client messages
+
+Widgets:
+
+“New leads this week”
+
+“Top performing sources”
+
+“Next appointments”
+
+Admins get global views:
+
+Team performance
+
+Revenue summaries
+
+Activity logs per agent
+
+🚦 Task Trigger Cheat Sheet
+Trigger	Action
+New lead added	Assign follow-up, send welcome email
+Status = “Under Contract”	Add checklist, set estimated close date
+No interaction in 5 days	Auto message or alert
+Favorite 3+ listings	Alert agent
+New doc uploaded	Notify agent
+Deal closed	Send thank-you + referral request
