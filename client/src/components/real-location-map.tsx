@@ -124,6 +124,7 @@ export default function RealLocationMap() {
 
             markersRef.current.push(marker);
           });
+          }
 
           setMapLoaded(true);
         };
