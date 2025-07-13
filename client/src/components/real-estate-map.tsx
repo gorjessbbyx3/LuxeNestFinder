@@ -37,6 +37,20 @@ export default function RealEstateMap() {
       propertyType: propertyType !== "all" ? propertyType : undefined,
       limit: 20
     }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      params.append('minPrice', priceRange[0].toString());
+      params.append('maxPrice', priceRange[1].toString());
+      if (selectedCity !== "all") params.append('city', selectedCity);
+      if (propertyType !== "all") params.append('propertyType', propertyType);
+      params.append('limit', '20');
+      
+      const response = await fetch(`/api/properties?${params}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch properties');
+      }
+      return response.json();
+    },
   });
 
   const filteredProperties = properties || [];

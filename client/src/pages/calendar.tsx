@@ -865,7 +865,7 @@ function AppointmentForm({
               <SelectValue placeholder="Select a lead (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No lead selected</SelectItem>
+              <SelectItem value="none">No lead selected</SelectItem>
               {leads.map(lead => (
                 <SelectItem key={lead.id} value={lead.id.toString()}>
                   {lead.firstName} {lead.lastName} - {lead.email}
@@ -881,7 +881,7 @@ function AppointmentForm({
               <SelectValue placeholder="Select a property (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">No property selected</SelectItem>
+              <SelectItem value="none">No property selected</SelectItem>
               {properties.slice(0, 10).map(property => (
                 <SelectItem key={property.id} value={property.id.toString()}>
                   {property.title} - {property.city}

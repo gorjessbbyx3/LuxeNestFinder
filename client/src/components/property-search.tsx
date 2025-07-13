@@ -102,7 +102,7 @@ export default function PropertySearch() {
                   <SelectValue placeholder="All Islands" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Islands</SelectItem>
+                  <SelectItem value="all">All Islands</SelectItem>
                   <SelectItem value="oahu">Oahu</SelectItem>
                   <SelectItem value="maui">Maui</SelectItem>
                   <SelectItem value="big-island">Big Island (Hawaii)</SelectItem>
@@ -120,7 +120,7 @@ export default function PropertySearch() {
                   <SelectValue placeholder="Any Type" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any Type</SelectItem>
+                  <SelectItem value="all">Any Type</SelectItem>
                   <SelectItem value="house">House</SelectItem>
                   <SelectItem value="condo">Condo</SelectItem>
                   <SelectItem value="townhouse">Townhouse</SelectItem>
@@ -139,7 +139,7 @@ export default function PropertySearch() {
                   <SelectValue placeholder="Any Distance" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any Distance</SelectItem>
+                  <SelectItem value="all">Any Distance</SelectItem>
                   <SelectItem value="oceanfront">Oceanfront</SelectItem>
                   <SelectItem value="ocean-view">Ocean View</SelectItem>
                   <SelectItem value="5-min-walk">5 min walk to beach</SelectItem>
@@ -157,7 +157,7 @@ export default function PropertySearch() {
                   <SelectValue placeholder="Any View" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Any View</SelectItem>
+                  <SelectItem value="all">Any View</SelectItem>
                   <SelectItem value="ocean">Ocean View</SelectItem>
                   <SelectItem value="mountain">Mountain View</SelectItem>
                   <SelectItem value="diamond-head">Diamond Head View</SelectItem>
@@ -178,7 +178,7 @@ export default function PropertySearch() {
                   <SelectValue placeholder="All Areas" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Areas</SelectItem>
+                  <SelectItem value="all">All Areas</SelectItem>
                   <SelectItem value="waikiki">Waikiki</SelectItem>
                   <SelectItem value="kailua">Kailua</SelectItem>
                   <SelectItem value="lanikai">Lanikai</SelectItem>
