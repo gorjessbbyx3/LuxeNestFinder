@@ -5,10 +5,22 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { Search, Brain, Home, Laptop, Waves, TrendingUp } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 export default function PropertySearch() {
   const [query, setQuery] = useState("");
   const [isAIMode, setIsAIMode] = useState(false);
+  const [island, setIsland] = useState<string>("");
+  const [oceanProximity, setOceanProximity] = useState<string>("");
+  const [viewType, setViewType] = useState<string>("");
+  const [microNeighborhood, setMicroNeighborhood] = useState<string>("");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
+  const [propertyType, setPropertyType] = useState<string>("");
+  const [bedrooms, setBedrooms] = useState<string>("");
+  const [bathrooms, setBathrooms] = useState<string>("");
+
 
   const quickFilters = [
     { icon: Home, label: "Family-Friendly", description: "Great schools & parks" },
@@ -82,8 +94,109 @@ export default function PropertySearch() {
             </Button>
           </div>
 
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="island">Island</Label>
+              <Select value={island} onValueChange={setIsland}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Islands" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Islands</SelectItem>
+                  <SelectItem value="oahu">Oahu</SelectItem>
+                  <SelectItem value="maui">Maui</SelectItem>
+                  <SelectItem value="big-island">Big Island (Hawaii)</SelectItem>
+                  <SelectItem value="kauai">Kauai</SelectItem>
+                  <SelectItem value="molokai">Molokai</SelectItem>
+                  <SelectItem value="lanai">Lanai</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="property-type">Property Type</Label>
+              <Select value={propertyType} onValueChange={setPropertyType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Any Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any Type</SelectItem>
+                  <SelectItem value="house">House</SelectItem>
+                  <SelectItem value="condo">Condo</SelectItem>
+                  <SelectItem value="townhouse">Townhouse</SelectItem>
+                  <SelectItem value="ohana">Ohana Unit</SelectItem>
+                  <SelectItem value="ranch">Ranch</SelectItem>
+                  <SelectItem value="land">Land</SelectItem>
+                  <SelectItem value="vacation-rental">Vacation Rental</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="ocean-proximity">Ocean Proximity</Label>
+              <Select value={oceanProximity} onValueChange={setOceanProximity}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Any Distance" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any Distance</SelectItem>
+                  <SelectItem value="oceanfront">Oceanfront</SelectItem>
+                  <SelectItem value="ocean-view">Ocean View</SelectItem>
+                  <SelectItem value="5-min-walk">5 min walk to beach</SelectItem>
+                  <SelectItem value="10-min-walk">10 min walk to beach</SelectItem>
+                  <SelectItem value="5-min-drive">5 min drive to beach</SelectItem>
+                  <SelectItem value="10-min-drive">10 min drive to beach</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="view-type">View Type</Label>
+              <Select value={viewType} onValueChange={setViewType}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Any View" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">Any View</SelectItem>
+                  <SelectItem value="ocean">Ocean View</SelectItem>
+                  <SelectItem value="mountain">Mountain View</SelectItem>
+                  <SelectItem value="diamond-head">Diamond Head View</SelectItem>
+                  <SelectItem value="golf-course">Golf Course View</SelectItem>
+                  <SelectItem value="sunset">Sunset View</SelectItem>
+                  <SelectItem value="city">City View</SelectItem>
+                  <SelectItem value="garden">Garden View</SelectItem>
+                </SelectContent>
+              </Select>
+            </div></div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+            <div>
+              <Label htmlFor="micro-neighborhood">Micro-Neighborhood</Label>
+              <Select value={microNeighborhood} onValueChange={setMicroNeighborhood}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All Areas" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="">All Areas</SelectItem>
+                  <SelectItem value="waikiki">Waikiki</SelectItem>
+                  <SelectItem value="kailua">Kailua</SelectItem>
+                  <SelectItem value="lanikai">Lanikai</SelectItem>
+                  <SelectItem value="hawaii-kai">Hawaii Kai</SelectItem>
+                  <SelectItem value="diamond-head">Diamond Head</SelectItem>
+                  <SelectItem value="kahala">Kahala</SelectItem>
+                  <SelectItem value="wailea">Wailea</SelectItem>
+                  <SelectItem value="lahaina">Lahaina</SelectItem>
+                  <SelectItem value="kona">Kona</SelectItem>
+                  <SelectItem value="hilo">Hilo</SelectItem>
+                  <SelectItem value="poipu">Poipu</SelectItem>
+                  <SelectItem value="princeville">Princeville</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+
           {/* Quick Filter Suggestions */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
             {quickFilters.map((filter, index) => (
               <motion.div
                 key={filter.label}

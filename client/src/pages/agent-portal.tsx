@@ -4,13 +4,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/navigation';
 import Footer from '@/components/footer';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import HawaiiBuyerProfile from '@/components/hawaii-buyer-profile';
+import HawaiiMarketingAutomation from '@/components/hawaii-marketing-automation';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
@@ -61,7 +63,8 @@ import {
   MessageSquare,
   StarOff,
   Forward,
-  Inbox as InboxIcon
+  Inbox as InboxIcon,
+  Palmtree
 } from 'lucide-react';
 
 export default function AgentPortalPage() {
@@ -149,12 +152,12 @@ export default function AgentPortalPage() {
       weekAgo.setDate(weekAgo.getDate() - 7);
       return leadDate > weekAgo;
     }).length;
-    
+
     const conversionRate = totalLeads > 0 ? Math.round((convertedLeads / totalLeads) * 100) : 0;
     const totalCommissionAmount = commissions.reduce((sum, c) => sum + (c.netCommission || 0), 0);
     const activeContracts = contracts.filter(c => c.status === 'active').length;
     const avgDealSize = contracts.length > 0 ? contracts.reduce((sum, c) => sum + c.contractAmount, 0) / contracts.length : 0;
-    
+
     const highPriorityLeads = leads.filter(l => l.priority >= 4).length;
     const upcomingAppointments = appointments.filter(a => {
       const appointmentDate = new Date(a.scheduledAt);
@@ -234,7 +237,7 @@ export default function AgentPortalPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Navigation />
-      
+
       {/* Executive Header */}
       <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-indigo-900 text-white pt-20 pb-8">
         <div className="container mx-auto px-6">
@@ -252,7 +255,7 @@ export default function AgentPortalPage() {
                 <p className="text-slate-300">Hawaii Luxury Real Estate Command Center</p>
               </div>
             </div>
-            
+
             <div className="flex items-center gap-6">
               <div className="text-center">
                 <div className="text-2xl font-bold">{metrics.totalLeads}</div>
@@ -270,7 +273,7 @@ export default function AgentPortalPage() {
                 <div className="text-2xl font-bold text-purple-400">{metrics.activeContracts}</div>
                 <div className="text-xs text-slate-400">Active Deals</div>
               </div>
-              
+
               <Button onClick={refreshData} variant="outline" size="sm" className="border-white/20 text-white hover:bg-white/10">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 Refresh
@@ -340,6 +343,14 @@ export default function AgentPortalPage() {
               <TabsTrigger value="analytics" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
                 <BarChart3 className="h-4 w-4 mr-2" />
                 Analytics
+              </TabsTrigger>
+              <TabsTrigger value="hawaii-buyers" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Users className="h-4 w-4 mr-2" />
+                Hawaii Buyers
+              </TabsTrigger>
+              <TabsTrigger value="hawaii-marketing" className="data-[state=active]:bg-white data-[state=active]:shadow-lg transition-all">
+                <Target className="h-4 w-4 mr-2" />
+                Hawaii Marketing
               </TabsTrigger>
             </TabsList>
               {activeTab === 'leads' && (
@@ -833,7 +844,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-blue-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -847,7 +858,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-purple-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -959,7 +970,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-blue-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -973,7 +984,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-purple-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -987,7 +998,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-orange-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -1109,7 +1120,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-green-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -1122,7 +1133,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-purple-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -1137,7 +1148,7 @@ export default function AgentPortalPage() {
                     </div>
                   </CardContent>
                 </Card>
-                
+
                 <Card className="border-l-4 border-l-orange-500">
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
@@ -1310,7 +1321,7 @@ export default function AgentPortalPage() {
                     const openDate = new Date(openHouse.dateTime);
                     const endDate = openHouse.endTime ? new Date(openHouse.endTime) : null;
                     const image = openHouse.images?.[0] || "https://images.unsplash.com/photo-1613490493576-7fde63acd811?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&h=400";
-                    
+
                     return (
                       <motion.div
                         key={openHouse.id}
@@ -1325,7 +1336,7 @@ export default function AgentPortalPage() {
                               alt={openHouse.title}
                               className="w-full h-full object-cover"
                             />
-                            
+
                             {/* MLS Badge */}
                             <div className="absolute top-3 left-3">
                               {openHouse.mlsNumber && (
@@ -1334,14 +1345,14 @@ export default function AgentPortalPage() {
                                 </Badge>
                               )}
                             </div>
-                            
+
                             {/* Price Badge */}
                             <div className="absolute top-3 right-3">
                               <Badge className="bg-primary text-primary-foreground font-bold">
                                 ${Number(openHouse.price).toLocaleString()}
                               </Badge>
                             </div>
-                            
+
                             {/* Status Badge */}
                             <div className="absolute bottom-3 left-3">
                               <Badge className={openHouse.isActive ? "bg-blue-600 text-white" : "bg-gray-600 text-white"}>
@@ -1349,14 +1360,14 @@ export default function AgentPortalPage() {
                               </Badge>
                             </div>
                           </div>
-                          
+
                           <CardContent className="p-4">
                             <h3 className="font-bold text-lg mb-2 line-clamp-2">{openHouse.title}</h3>
                             <p className="text-muted-foreground text-sm flex items-center mb-3">
                               <MapPin className="h-4 w-4 mr-1" />
                               {openHouse.address}, {openHouse.city}
                             </p>
-                            
+
                             {/* Property Stats */}
                             <div className="grid grid-cols-3 gap-2 text-center mb-3">
                               <div>
@@ -1372,7 +1383,7 @@ export default function AgentPortalPage() {
                                 <div className="text-xs text-muted-foreground">Sq Ft</div>
                               </div>
                             </div>
-                            
+
                             {/* Date & Time */}
                             <div className="bg-muted rounded-lg p-3 mb-3">
                               <div className="flex items-center justify-between">
@@ -1401,7 +1412,7 @@ export default function AgentPortalPage() {
                                 <Clock className="h-4 w-4 text-muted-foreground" />
                               </div>
                             </div>
-                            
+
                             {/* Host Information */}
                             {openHouse.hostAgent && (
                               <div className="border-t pt-3 mb-3">
@@ -1425,7 +1436,7 @@ export default function AgentPortalPage() {
                                 </div>
                               </div>
                             )}
-                            
+
                             {/* Actions */}
                             <div className="flex gap-2">
                               <Button size="sm" className="flex-1">
@@ -1437,7 +1448,7 @@ export default function AgentPortalPage() {
                                 Add to Calendar
                               </Button>
                             </div>
-                            
+
                             {/* Source */}
                             <div className="mt-3 pt-3 border-t text-xs text-muted-foreground flex justify-between">
                               <span>Source: Hawaii Board of Realtors</span>
@@ -1538,7 +1549,7 @@ function NewLeadForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           />
         </div>
       </div>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor="email" className="text-sm font-semibold">Email *</Label>
@@ -1562,7 +1573,7 @@ function NewLeadForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           />
         </div>
       </div>
-      
+
       <div>
         <Label htmlFor="budget" className="text-sm font-semibold">Budget</Label>
         <Input
@@ -1574,7 +1585,7 @@ function NewLeadForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           className="mt-1"
         />
       </div>
-      
+
       <div className="grid grid-cols-3 gap-4">
         <div>
           <Label htmlFor="buyerType" className="text-sm font-semibold">Client Type</Label>
@@ -1590,7 +1601,7 @@ function NewLeadForm({ onSubmit }: { onSubmit: (data: any) => void }) {
             </SelectContent>
           </Select>
         </div>
-        
+
         <div>
           <Label htmlFor="priority" className="text-sm font-semibold">Priority Level</Label>
           <Select value={formData.priority.toString()} onValueChange={(value) => setFormData({ ...formData, priority: parseInt(value) })}>
@@ -1636,7 +1647,7 @@ function NewLeadForm({ onSubmit }: { onSubmit: (data: any) => void }) {
           placeholder="Any additional information about this lead..."
         />
       </div>
-      
+
       <div className="flex justify-end gap-3 pt-6 border-t">
         <Button type="button" variant="outline">
           Cancel
@@ -1724,7 +1735,7 @@ function EmbeddedCalendar() {
   const weekDays = useMemo(() => {
     const start = new Date(currentDate);
     start.setDate(start.getDate() - start.getDay());
-    
+
     const days = [];
     for (let i = 0; i < 7; i++) {
       const day = new Date(start);
@@ -1741,7 +1752,7 @@ function EmbeddedCalendar() {
     const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - startDate.getDay());
-    
+
     const days = [];
     for (let i = 0; i < 42; i++) {
       const day = new Date(startDate);
@@ -1794,7 +1805,7 @@ function EmbeddedCalendar() {
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          
+
           <div className="text-xl font-bold">
             {viewMode === 'month' ? (
               `${MONTHS[currentDate.getMonth()]} ${currentDate.getFullYear()}`
@@ -1809,7 +1820,7 @@ function EmbeddedCalendar() {
               })
             )}
           </div>
-          
+
           <Button
             variant="outline"
             size="sm"
@@ -1834,7 +1845,7 @@ function EmbeddedCalendar() {
               </Button>
             ))}
           </div>
-          
+
           <Dialog open={isNewAppointmentOpen} onOpenChange={setIsNewAppointmentOpen}>
             <DialogTrigger asChild>
               <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
@@ -1876,7 +1887,7 @@ function EmbeddedCalendar() {
             ))}
           </select>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Search className="h-4 w-4 text-gray-500" />
           <Input
@@ -1900,7 +1911,7 @@ function EmbeddedCalendar() {
             const dayAppointments = getAppointmentsForDay(day);
             const isToday = day.toDateString() === new Date().toDateString();
             const isCurrentMonth = day.getMonth() === currentDate.getMonth();
-            
+
             return (
               <div
                 key={index}
@@ -1954,7 +1965,7 @@ function EmbeddedCalendar() {
             const dayAppointments = getAppointmentsForDay(day);
             const isToday = day.toDateString() === new Date().toDateString();
             const isCurrentMonth = day.getMonth() === currentDate.getMonth();
-            
+
             return (
               <div
                 key={index}
@@ -2010,7 +2021,7 @@ function EmbeddedCalendar() {
             {getAppointmentsForDay(selectedDate).map((appointment, idx) => {
               const typeConfig = getAppointmentTypeConfig(appointment.type);
               const IconComponent = typeConfig.icon;
-              
+
               return (
                 <div
                   key={idx}
@@ -2057,7 +2068,7 @@ function EmbeddedCalendar() {
         <h3 className="text-lg font-semibold mb-4">
           {viewMode === 'day' ? 'Today\'s Appointments' : 'Upcoming Appointments'}
         </h3>
-        
+
         {appointmentsLoading ? (
           <div className="flex justify-center py-8">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -2067,7 +2078,7 @@ function EmbeddedCalendar() {
             {appointments.slice(0, 10).map((appointment) => {
               const typeConfig = getAppointmentTypeConfig(appointment.type);
               const IconComponent = typeConfig.icon;
-              
+
               return (
                 <div
                   key={appointment.id}
@@ -2154,7 +2165,7 @@ function EmbeddedInbox() {
   // Process and combine all requests
   const allRequests = useMemo(() => {
     const requests = [];
-    
+
     propertyInquiries.forEach(inquiry => {
       requests.push({
         id: inquiry.id,
@@ -2336,7 +2347,7 @@ function EmbeddedInbox() {
               {filteredRequests.map((request) => {
                 const typeConfig = getTypeConfig(request.category);
                 const IconComponent = typeConfig.icon;
-                
+
                 return (
                   <motion.div
                     key={`${request.type}-${request.id}`}
@@ -2427,7 +2438,7 @@ function EmbeddedInbox() {
                   </motion.div>
                 );
               })}
-              
+
               {filteredRequests.length === 0 && (
                 <div className="text-center py-12">
                   <InboxIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />

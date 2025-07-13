@@ -26,23 +26,23 @@ interface HBROpenHouseData {
 
 export class OpenHouseScraper {
   private readonly sourceUrl = "https://www.hicentral.com/pdf/HBROpenHouseReport.pdf";
-  
+
   /**
    * Scrape open house data from Hawaii Board of Realtors PDF report
    * This would typically parse the PDF, but for now we'll simulate the data structure
    */
   private async fetchOpenHouseData(): Promise<HBROpenHouseData[]> {
     console.log("🏠 Fetching Hawaii Board of Realtors Open House Report...");
-    
+
     // In a real implementation, this would:
     // 1. Download the PDF from HBR
     // 2. Parse the PDF content
     // 3. Extract open house listings
     // 4. Return structured data
-    
+
     // For now, we'll return sample data structure that matches the expected format
     const upcomingWeekend = this.getNextWeekend();
-    
+
     return [
       {
         mlsNumber: "202515151",
@@ -91,7 +91,7 @@ export class OpenHouseScraper {
       }
     ];
   }
-  
+
   /**
    * Get the next Saturday date
    */
@@ -103,16 +103,16 @@ export class OpenHouseScraper {
     nextSaturday.setHours(0, 0, 0, 0);
     return nextSaturday;
   }
-  
+
   /**
    * Update open house database with latest data
    */
   async updateOpenHouses(): Promise<void> {
     try {
       console.log("🔄 Starting open house update from HBR report...");
-      
+
       const openHouseData = await this.fetchOpenHouseData();
-      
+
       for (const house of openHouseData) {
         // Check if open house already exists
         const existing = await db
@@ -125,7 +125,7 @@ export class OpenHouseScraper {
             )
           )
           .limit(1);
-        
+
         if (existing.length === 0) {
           // Insert new open house
           const insertData: InsertOpenHouse = {
@@ -149,14 +149,14 @@ export class OpenHouseScraper {
             images: house.images || [],
             sourceUrl: this.sourceUrl,
           };
-          
+
           await db.insert(openHouses).values(insertData);
           console.log(`✅ Added open house: ${house.title}`);
         } else {
           console.log(`🔄 Open house already exists: ${house.title}`);
         }
       }
-      
+
       // Mark expired open houses as inactive
       const now = new Date();
       await db
@@ -168,13 +168,13 @@ export class OpenHouseScraper {
             gte(now, openHouses.endTime)
           )
         );
-      
+
       console.log("✅ Open house update completed");
     } catch (error) {
       console.error("❌ Error updating open houses:", error);
     }
   }
-  
+
   /**
    * Get active open houses
    */
@@ -191,7 +191,7 @@ export class OpenHouseScraper {
       )
       .orderBy(openHouses.dateTime);
   }
-  
+
   /**
    * Start the automated scheduler
    */
@@ -204,9 +204,9 @@ export class OpenHouseScraper {
     }, {
       timezone: "Pacific/Honolulu"
     });
-    
+
     console.log("📅 Open house scheduler started - updates every Friday at 3:35 PM HST");
-    
+
     // Also run once immediately to populate initial data
     this.updateOpenHouses();
   }
