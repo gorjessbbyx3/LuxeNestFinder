@@ -5,11 +5,20 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
+let pool: any;
+let db: any;
+
 if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
+  console.warn("DATABASE_URL not set. Database features will be unavailable.");
+  // For migration compatibility, we'll create a mock pool
+  pool = {
+    query: () => Promise.reject(new Error("Database not configured")),
+    connect: () => Promise.reject(new Error("Database not configured")),
+  };
+  db = null;
+} else {
+  pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  db = drizzle({ client: pool, schema });
 }
 
-export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
-export const db = drizzle({ client: pool, schema });
+export { pool, db };
